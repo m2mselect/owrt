@@ -1,0 +1,11 @@
+config ntpserver
+	option hostname 'timeserver.ru'
+	option port     '123'
+
+config ntpdrift
+	option freq     '0'
+
+config ntpclient
+	option interval	600
+	#option count	10
+	#option interface wan

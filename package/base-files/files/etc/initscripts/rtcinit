@@ -1,0 +1,2 @@
+ln -s /dev/rtc1 /dev/rtc
+/usr/sbin/hwclock --localtime -s

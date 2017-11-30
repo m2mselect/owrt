@@ -1,0 +1,8 @@
+#!/bin/sh
+
+#echo "{NET|IFACE}: INTERFACE: $INTERFACE, DEVICE: $DEVICE, ACTION: $ACTION" >> /tmp/foo1.log
+
+if [ "$DEVICE" = "eth1" -a "$ACTION" = "ifup" ]; then
+        sleep 2
+        ifconfig eth1 up
+fi

@@ -1,0 +1,47 @@
+#!/bin/sh
+
+local ENABLED="$1"
+if [ "$ENABLED" = "1" ]; then
+	local ifname="$2"
+	local wan_ifname="$3"
+	local mode="$4"
+	local wan_ip=""
+	while [ true ]; do
+		wan_ip=`ifconfig "$wan_ifname" | grep "inet addr" | egrep -o "[0-9]*\.[0-9]*\.[0-9]*\.[0-9]*" | grep -m 1 ".*" 2>/dev/null`
+		if [ ! -z "$wan_ip" ]; then
+			break
+		fi
+		sleep 5
+	done
+	logger -t "GRE-TUN" "WAN_ip=${wan_ip}"
+
+	local remote_ip="$5"
+	local remote_network="$6"
+	local remote_netmask="$7"
+	local tunnel_ip="$8"
+	local tunnel_netmask="$9"
+	local tunnel_network=`ipcalc.sh $tunnel_ip $tunnel_netmask | grep NETWORK | cut -d= -f2`
+
+	local ttl="$10"
+	local pmtud="$11"
+	local mtu="$12"
+	
+	echo "$ifname $remote_ip $wan_ip $tunnel_ip"
+	if [ -n "$ifname" -a -n "$remote_ip" -a -n "$wan_ip" -a -n "$tunnel_ip" ]; then
+		logger "[GRE-TUN] ${ifname} Setuping new tunnel..."
+		if [ "$pmtud" = "1" ]; then
+			ip tunnel add "$ifname" mode "$mode" remote "$remote_ip" local "$wan_ip" nopmtudisc
+		else
+			ip tunnel add "$ifname" mode "$mode" remote "$remote_ip" local "$wan_ip" ttl "$ttl"
+		fi
+		ip link set "$ifname" up
+		ip addr add "$tunnel_ip"/"$tunnel_netmask" dev "$ifname" 
+		ip route add "$remote_network"/"$remote_netmask" dev "$ifname"
+		if [ "$mtu" -ne 0 ]; then
+			ip link set "$ifname" mtu "$mtu"
+		fi
+		logger -t "GRE-TUN" "Tunnel ${ifname} created (Remote_ip=${remote_ip}, WAN_ip=${wan_ip}, Tunnel_ip=${tunnel_ip})"
+	else
+		logger -t "GRE-TUN" "${ifname} error: Tunnel not created (Remote_ip=${remote_ip}, WAN_ip=${wan_ip}, Tunnel_ip=${tunnel_ip})"
+	fi
+fi

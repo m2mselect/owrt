@@ -1,0 +1,11 @@
+#!/bin/sh
+
+uci -q batch <<-EOF >/dev/null
+	delete ucitrack.@gre_tunnel[-1]
+	add ucitrack gre_tunnel
+	set ucitrack.@gre_tunnel[-1].init=gre-tunnel
+	commit ucitrack
+EOF
+
+rm -f /tmp/luci-indexcache
+exit 0

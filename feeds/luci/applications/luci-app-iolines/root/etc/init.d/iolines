@@ -1,0 +1,61 @@
+#!/bin/sh /etc/rc.common
+
+START=90
+INITSCR="/etc/initscripts/iolines"
+
+load_iolines() {	
+
+	config_get dev "$1" "dev"
+	
+	num=$(echo ${dev:7:1})
+	pu="/dev/pu$num"
+	pd="/dev/pd$num"
+	
+	config_get mode "$1" "mode"
+	config_get enabled "$1" "enabled" "0"
+	if [ $enabled -eq 1 ]; then
+
+		case "$mode" in
+			"mode1")
+				echo "echo in > $pu/direction" >> "$INITSCR"
+				echo "echo low > $pd/direction" >> "$INITSCR"
+				;;
+			"mode2")
+				echo "echo low > $pu/direction" >> "$INITSCR"
+				echo "echo low > $pd/direction" >> "$INITSCR"
+				;;
+			"mode3")
+				echo "echo high > $pu/direction" >> "$INITSCR"
+				echo "echo high > $pd/direction" >> "$INITSCR"
+				;;
+		esac
+
+		$INITSCR
+	else
+		case "$mode" in
+			"mode1")
+				echo in > $pu/direction
+				echo low > $pd/direction
+				;;
+			"mode2")
+				echo low > $pu/direction
+				echo low > $pd/direction
+				;;
+			"mode3")
+				echo high > $pu/direction
+				echo high > $pd/direction
+				;;
+		esac		
+	fi
+}
+
+restart() {
+
+	rm "$INITSCR"
+	touch "$INITSCR"
+	echo "/etc/initscripts/symlinks" >> "$INITSCR"
+	chmod +x "$INITSCR"
+	
+	config_load iolines
+	config_foreach load_iolines io
+}

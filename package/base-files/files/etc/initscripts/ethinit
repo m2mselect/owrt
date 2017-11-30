@@ -1,0 +1,20 @@
+#!/bin/ash
+echo 60 > /sys/class/gpio/export
+echo out > /sys/class/gpio/gpio60/direction
+echo 1 > /sys/class/gpio/gpio60/value
+
+MAC0=$(fw_printenv ethaddr | sed s/ethaddr=// | sed -e s/://g)
+MAC1=$(fw_printenv eth1addr | sed s/eth1addr=// | sed -e s/://g)
+
+if [ "$MAC0" = "001122334455" -o "$MAC1" = "001122334466" -o "$MAC0" = "$MAC1" ]; then
+		SERIALNUM=$(getserialnum)
+		[ "$SERIALNUM" = "0" ] && exit 0
+		SERIALNUM=$(getserialnum | sed 's/\(..\)/\1:/g' | sed 's/.$//' | tr "a-z" "A-Z")
+		MAC0="F8:1D:"$SERIALNUM
+		fw_setenv ethaddr $MAC0
+		SERIALNUM=$((0x$(getserialnum)))
+		SERIALNUM=$(($SERIALNUM + 1))
+		SERIALNUM=$(echo "obase=16; $SERIALNUM" | bc | sed 's/\(..\)/\1:/g' | sed 's/.$//')
+		MAC1="F8:1D:"$SERIALNUM
+		fw_setenv eth1addr $MAC1
+fi

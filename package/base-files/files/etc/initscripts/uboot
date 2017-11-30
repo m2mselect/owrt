@@ -1,0 +1,13 @@
+#!/bin/ash
+
+	fw_setenv autoupgrade "nand read \${loadaddr} updroot \${filesize_rootfs} ; ubi part root ; ubi remove rootfs ; ubi remove rootfs_data ; ubi create rootfs 0x2A00000 ; ubi create rootfs_data 0x1E00000 ; ubi write \${loadaddr} rootfs \${filesize_rootfs} ; saveenv"
+
+	fw_setenv factory_reset "nand read \${loadaddr} updroot \${filesize_rootfs} ; nand erase.part root ; ubi part root ; ubi create rootfs 0x2A00000 ; ubi create rootfs_data 0x1E00000 ; ubi create extra_ubi ; ubi write \${loadaddr} rootfs \${filesize_rootfs}"
+
+	fw_setenv update_fs "if tftp 0x42000000 rootfs.img ; then setenv filesize_rootfs \${filesize} ; saveenv ; nand erase.part root ; ubi part root ; ubi create rootfs 0x2A00000 ; ubi create rootfs_data 0x1E00000 ; ubi create extra_ubi ; ubi write 0x42000000 rootfs \${filesize_rootfs} ; nand erase.part updroot ; nand write 0x42000000 updroot \${filesize_rootfs} ; fi"
+
+	fw_setenv nand_boot "if itest \${update_flag} == 15963 ; then run autoupgrade;setenv update_flag 111;saveenv ; fi ;if itest \${update_flag} == 15960 ; then run factory_reset;setenv update_flag 111;saveenv ; fi ;nand read 0x41000000 fdt \${filesize_fdt} ;nand read 0x42000000 kernel \${filesize_kernel} ; bootm 0x42000000 - 0x41000000"
+
+	fw_setenv update_flag "15960"
+
+	reboot

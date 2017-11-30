@@ -1,0 +1,17 @@
+#!/bin/sh
+
+#echo "{NET|IFACE}: INTERFACE: $INTERFACE, DEVICE: $DEVICE, ACTION: $ACTION" >> /tmp/foo.log
+
+if [ "$ACTION" = "ifup" -o "$ACTION" = "ifdown" ]; then
+        ETH=$(grep -r eth0 /etc/config/network)        
+        if [ -z "$ETH" ]; then
+                uci set network.lan=interface
+                uci set network.lan.proto=static
+                uci set network.lan.ifname=eth0
+                uci set network.lan.ipaddr=192.168.88.1
+                uci set network.lan.netmask=255.255.255.0
+                uci commit
+                /etc/init.d/network restart
+        fi
+fi
+

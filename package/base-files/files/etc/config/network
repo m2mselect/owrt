@@ -1,0 +1,18 @@
+
+config interface 'loopback'
+	option ifname 'lo'
+	option proto 'static'
+	option ipaddr '127.0.0.1'
+	option netmask '255.0.0.0'
+
+config interface 'lan'
+	option ifname 'eth0 eth1 usb0'
+	option type 'bridge'
+	option proto 'static'
+	option ipaddr '192.168.88.1'
+	option netmask '255.255.255.0'
+	option ip6assign '60'
+
+config globals 'globals'
+	option ula_prefix 'fd32:0222:7789::/48'
+

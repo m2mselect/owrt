@@ -1,0 +1,1 @@
+"='-I'.substitute(&path, ',', '\n-I', 'g')<CR>

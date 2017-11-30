@@ -1,0 +1,24 @@
+	echo 51 > /sys/class/gpio/export
+	echo 50 > /sys/class/gpio/export
+	ln -s /sys/class/gpio/gpio51 /dev/pu0
+	ln -s /sys/class/gpio/gpio50 /dev/pd0
+	ln -s /sys/bus/iio/devices/iio\:device0/in_voltage0_raw /dev/io0
+
+	echo 54 > /sys/class/gpio/export
+	echo 53 > /sys/class/gpio/export
+	ln -s /sys/class/gpio/gpio54 /dev/pu1
+	ln -s /sys/class/gpio/gpio53 /dev/pd1
+	ln -s /sys/bus/iio/devices/iio\:device0/in_voltage1_raw /dev/io1
+
+	echo 57 > /sys/class/gpio/export
+	echo 64 > /sys/class/gpio/export
+	ln -s /sys/class/gpio/gpio57 /dev/pu2
+	ln -s /sys/class/gpio/gpio64 /dev/pd2
+	ln -s /sys/bus/iio/devices/iio\:device0/in_voltage4_raw /dev/io2
+
+	echo 66 > /sys/class/gpio/export
+	echo 65 > /sys/class/gpio/export
+	ln -s /sys/class/gpio/gpio66 /dev/pu3
+	ln -s /sys/class/gpio/gpio65 /dev/pd3
+	ln -s /sys/bus/iio/devices/iio\:device0/in_voltage6_raw /dev/io3
+	

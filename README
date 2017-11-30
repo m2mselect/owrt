@@ -1,0 +1,20 @@
+Preparing for Ubuntu 64bit:
+sudo apt install build-essential subversion libncurses5-dev zlib1g-dev gawk gcc-multilib flex git-core gettext libssl-dev
+
+Sequence of commands for successful build:
+
+0) create a local directory and copy the sources
+mkdir ~/adgt && cd ~/adgt
+git clone https://github.com/m2mselect/owrt.git
+
+1) pack and move kernel to dl
+./prepatch.sh
+
+2) run build process
+make V=s -jX
+where is -jX number of CPU threads +1 ( -j5 for 4-threads, -j9 for 8-threads, etc)
+
+3) make ubifs image and copy it to ./result directory
+sudo ./alldone.sh
+
+The firmware will be in the ./result directory. You can upload the archive sysupgrade_gtr.tar via the web interface.

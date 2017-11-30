@@ -1,0 +1,45 @@
+
+msgid "PollMyDevice"
+msgstr "Опрос портов по TCP"
+
+msgid "Utility Settings"
+msgstr "Настройки"
+
+msgid "TCP to RS232/RS485 converter"
+msgstr "Конвертер TCP - Последовательный порт"
+
+msgid "BaudRate"
+msgstr "Скорость (бод)"
+
+msgid "ByteSize"
+msgstr "Размер слова"
+
+msgid "Parity"
+msgstr "Четность"
+
+msgid "Flow Control"
+msgstr "Управление потоком"
+
+msgid "StopBits"
+msgstr "Стоп-биты"
+
+msgid "Server Port"
+msgstr "Порт"
+
+msgid "Connection Hold Time (sec)"
+msgstr "Время удержания приоритета соединения (сек)"
+
+msgid "Client Host or IP Address"
+msgstr "Адрес сервера"
+
+msgid "Client Port"
+msgstr "Порт сервера"
+
+msgid "Client Reconnection Timeout (sec)"
+msgstr "Таймаут соединения (сек)"
+
+msgid "Client Authentification"
+msgstr "Авторизация ADT"
+
+msgid "Use ADT Authentification"
+msgstr "Использовать авторизацию по ADT ID"

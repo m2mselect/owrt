@@ -1,0 +1,120 @@
+#!/bin/sh
+
+PRG=enlogic
+#PTH=/sys/home/enlogic/
+#cd $PTH
+UPD=0
+TMPD=/tmp/enl
+LF=/var/start.log
+TLF="/tmp/$LF"
+
+
+get_dt()
+{
+    echo `date +%X" "%d.%m.%Y`
+}
+
+del_file()
+{
+    if [ -f $1 ]; then
+	rm $1;
+        echo "`get_dt` | del $1" >> $LF
+    fi
+}
+
+get_sz()
+{
+    echo `ls -l $1 | awk '{print $5}'`
+}
+
+finish_update()
+{
+	rm -f $TMPD/*
+	del_file $PRG.tar
+}
+
+
+update()
+{
+	echo "updating enlogic"
+
+	mkdir $TMPD
+        tar xf $PRG.tar -C $TMPD/
+        if [ $? -ne 0 ]; then
+		echo "`get_dt` | tar error" >> $LF
+		return 1
+	fi
+
+
+	if [ -f "$TMPD/run" ]; then
+		chmod +x $TMPD/run
+		$TMPD/run
+	fi
+
+
+	if [ ! -f "$TMPD/$PRG" ]; then
+		echo "`get_dt` | not found $TMPD/$PRG" >> $LF
+		return 2
+	fi
+
+	chmod +x $TMPD/$PRG
+
+	TRG=`$TMPD/$PRG -v | tail -1 | grep -c EnLogic`
+	if [ $TRG -eq 0 ]; then
+		echo "`get_dt` | not found $TMPD/$PRG metric" >> $LF
+		return 3
+	fi
+
+	mv $TMPD/$PRG ./
+	echo "`get_dt` | successful update" >> $LF
+
+	UPD=10
+	return 0;
+}
+
+
+
+echo ""
+echo "prepare to start EnLogic system"
+
+del_file "config.new"
+del_file "$PRG.new"
+
+if [ -f "$PRG.tar" ]; then
+	update
+	if [ $? -gt 0 ]; then
+		UPD=11;
+	fi 
+	finish_update
+fi
+
+
+if [ ! -f $PRG ]; then
+	echo "not found $PRG"
+  	exit 1
+fi
+
+echo "`get_dt` | starting enlogic" >> $LF
+echo "starting enlogic system"
+
+
+if [ $UPD -ne 0 ]; then
+  PRG="$PRG upd=0x$UPD"
+fi
+
+#echo $PRG
+
+#if [ -f "network.conf" ]; then
+#	./network
+#fi
+
+sleep 10
+
+./$PRG  >> /dev/null &
+
+
+#cd web
+#./mini_httpd -C config_httpd
+
+exit 0
+

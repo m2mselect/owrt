@@ -1,0 +1,22 @@
+#!/bin/sh
+
+#echo "{NET|IFACE}: INTERFACE: $INTERFACE, DEVICE: $DEVICE, ACTION: $ACTION" >> /tmp/foo1.log
+
+if [ "$ACTION" = "ifup" ]; then
+        GRE=$(echo $DEVICE | awk -F '_' '{print $1}') 2>/dev/null        
+        if [ "$GRE" = "gre" ]; then
+        	ENABLED=$(uci get gre_tunnel.$DEVICE.enabled)
+        	ifname=$(uci get gre_tunnel.$DEVICE.ifname)
+        	wan_ifname=$(uci get gre_tunnel.$DEVICE.wan_ifname)
+        	remote_ip=$(uci get gre_tunnel.$DEVICE.remote_ip)
+        	remote_network=$(uci get gre_tunnel.$DEVICE.remote_network)
+        	remote_netmask=$(uci get gre_tunnel.$DEVICE.remote_netmask)
+        	tunnel_ip=$(uci get gre_tunnel.$DEVICE.tunnel_ip)
+        	tunnel_netmask=$(uci get gre_tunnel.$DEVICE.tunnel_netmask)
+        	ttl=$(uci get gre_tunnel.$DEVICE.ttl)
+        	pmtud=$(uci get gre_tunnel.$DEVICE.pmtud)
+        	mtu=$(uci get gre_tunnel.$DEVICE.mtu)
+                mode=$(uci get gre_tunnel.$DEVICE.mode)
+        	gre-tunnel "$ENABLED" "$ifname" "$wan_ifname" "$mode" "$remote_ip" "$remote_network" "$remote_netmask" "$tunnel_ip" "$tunnel_netmask" "$ttl" "$pmtud" "$mtu"
+        fi
+fi

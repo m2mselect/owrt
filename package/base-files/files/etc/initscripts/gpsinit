@@ -1,0 +1,6 @@
+#!/bin/ash
+ln -s /dev/pps0 /dev/gpspps0
+ln -s /dev/ttyAPP1 /dev/gps0
+sleep 2
+/etc/init.d/gpsd restart
+/etc/init.d/ntpd restart

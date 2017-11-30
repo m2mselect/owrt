@@ -1,0 +1,17 @@
+#!/bin/ash
+mkdir /mnt/data
+mount -t ubifs ubi0_2 /mnt/data
+
+OVRL_BUG=$(dmesg | grep ramoverlay)
+	if [ ! -z "$OVRL_BUG" ]; then
+		fw_setenv update_flag 15963
+		reboot
+	fi
+
+AFTER_UPD=$(fw_printenv update_flag | sed -e s/update_flag=//)
+if [ "$AFTER_UPD" -eq "111" ]; then
+	cp -ap /mnt/data/upper/* /
+	rm -r /mnt/data/upper/
+	fw_setenv update_flag 112
+	sync
+fi

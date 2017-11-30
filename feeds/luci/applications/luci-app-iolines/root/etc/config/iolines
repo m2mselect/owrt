@@ -1,0 +1,24 @@
+config io
+	option name "IO1"
+	option dev "/dev/io0"
+	option enabled "0"
+	option mode "mode1"
+
+config io
+	option name "IO2"
+	option dev "/dev/io1"
+	option enabled "0"
+	option mode "mode1"
+
+config io
+	option name "IO3"
+	option dev "/dev/io2"
+	option enabled "0"
+	option mode "mode1"
+
+config io
+	option name "IO4"
+	option dev "/dev/io3"
+	option enabled "0"
+	option mode "mode1"
+

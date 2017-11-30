@@ -1,0 +1,172 @@
+#!/bin/sh
+MODETEST=0
+try_upgrade ()
+{
+	VER_STRING=$(fw_printenv ver | awk -F 'Build ADT ' '{print $2}')
+	VER_FIRST=$(echo $VER_STRING | awk -F '.' '{print $1}')
+	VER_SECOND=$(echo $VER_STRING | awk -F '.' '{print $2}')
+	VER_THIRD=$(echo $VER_STRING | awk -F '.' '{print $3}')
+
+	if  [[ $VER_FIRST == ${VER_FIRST//[^0-9]/} ]] && [[ $VER_SECOND == ${VER_SECOND//[^0-9]/} ]] && [[ $VER_THIRD == ${VER_THIRD//[^0-9]/} ]]
+	then
+		# sophisticated bootloader check (caused by bugs in early versions)
+		if [ "$VER_FIRST" -eq 0 ]
+		then
+	        echo "Bootloader is too old"	# 0.x.x
+	        exit 1
+		fi
+
+		if [ "$VER_FIRST" -eq 1 ]
+		then
+			if  [ "$VER_SECOND" -eq 0 ]
+			then
+				echo "Bootloader is too old"	# 1.0.x
+	        	exit 1
+			fi
+
+			if  [ "$VER_SECOND" -eq 1 ]
+			then
+				if  [ "$VER_THIRD" -eq 0 ]
+		        then
+		            echo "Bootloader is too old" # 1.1.0
+		            exit 1
+		    	fi
+			fi
+		fi
+
+	    #### if bootloader is suitable:
+	    cd /tmp/
+		if [ ! -f /tmp/sysupgrade_gtr.tar ]; 
+		then
+	    	echo "Sysupgrade file not found!"
+		else
+
+
+			### if we have an upgrade archive
+			tar -xf sysupgrade_gtr.tar
+			if [ ! -f rootfs.img ] || [ ! -f openwrt-mxs-uImage ] || [ ! -f fdt.dtb ] || [ ! -f check.md5 ]; 
+			then
+		    	echo "Upgrade archive is corrupted"
+		    	exit 1
+		    fi
+
+		    MD5_FDT=$(md5sum fdt.dtb)
+		    MD5_KERN=$(md5sum openwrt-mxs-uImage)
+		    MD5_ROOT=$(md5sum rootfs.img)
+		    MD5_FDT_FROMFILE=$(sed -n 1p check.md5)
+		    MD5_KERN_FROMFILE=$(sed -n 2p check.md5)
+		    MD5_ROOT_FROMFILE=$(sed -n 3p check.md5)
+		    if [ -f openwrt_release ]; then
+		    	MD5_VERSION=$(md5sum openwrt_release)
+		    	MD5_VERSION_FROMFILE=$(sed -n 4p check.md5)		
+		    	if [ "$MD5_VERSION" != "$MD5_VERSION_FROMFILE" ]; then    	
+		    		echo "Upgrade archive is corrupted"
+		    		exit 1
+		    	fi
+		    	NEW_VERSION=$(grep 'Chaos' openwrt_release | awk -F 'Build ' '{print $2}' | awk -F '.' '{print $1}')
+		    	if [ "$NEW_VERSION" != "$VER_FIRST" ] && [ -f openwrt_release ]; then
+		    		echo "Firmware not supported by hardware"
+		    		exit 1
+		    	fi
+		    fi
+
+		    if [ "$MD5_FDT" != "$MD5_FDT_FROMFILE" ] || [ "$MD5_KERN" != "$MD5_KERN_FROMFILE" ] || [ "$MD5_ROOT" != "$MD5_ROOT_FROMFILE" ]; 
+			then
+		    	echo "Upgrade archive is corrupted"
+		    	exit 1
+		    fi
+		    UPD_FLAG=$(fw_printenv update_flag | sed -e s/update_flag=//)
+		    if [ "$UPD_FLAG" -eq "113" ]; then
+				DATA_FREE=$(df | grep ubi0_2 | awk -F ' ' '{print$4}')
+				if [ -z "$DATA_FREE" ]; then
+					echo 'Option "Keep settings" not supported'
+					fw_setenv update_flag 112
+		    		exit 1
+				fi
+				OVERLAY_USED=$(df | grep ubi0_1 | awk -F ' ' '{print$3}')
+				if [ "$DATA_FREE" -lt "$OVERLAY_USED" ]; then
+					echo "No space left on device to save overlay"
+		    		exit 1
+				fi
+			fi
+
+		    ## if we have all upgrade files
+		    # if test mode
+		    if [ "$MODETEST" -eq 1 ]
+			then
+				rm rootfs.img
+				rm openwrt-mxs-uImage
+				rm fdt.dtb
+				rm check.md5
+				rm openwrt_release
+				echo OK
+				exit 0
+			fi
+			#
+			mtd erase updroot
+			mtd write rootfs.img  updroot
+			fw_setenv filesize_rootfs $(printf %x $(stat -c %s rootfs.img))
+			mtd erase kernel
+			mtd write openwrt-mxs-uImage kernel
+			mtd verify openwrt-mxs-uImage kernel
+			fw_setenv filesize_kernel $(printf %x $(stat -c %s openwrt-mxs-uImage))
+			mtd erase fdt
+			mtd write fdt.dtb fdt
+			mtd verify fdt.dtb fdt
+			fw_setenv filesize_fdt $(printf %x $(stat -c %s fdt.dtb))
+			UPD_FLAG=$(fw_printenv update_flag | sed -e s/update_flag=//)			
+			if [ "$UPD_FLAG" -eq "113" ]; then
+				mkdir /mnt/data/upper
+				cp -pa /overlay/upper/* /mnt/data/upper/
+				rm -r /mnt/data/upper/etc/uci-defaults/
+				rm -r /mnt/data/upper/mnt/
+				rm -r /mnt/data/upper/upper/
+				rm /mnt/data/upper/etc/banner
+				rm /mnt/data/upper/etc/openwrt_release
+				rm /mnt/data/upper/sbin/sysupgrade
+                rm /mnt/data/upper/etc/config/system
+                rm /mnt/data/upper/usr/lib/lua/luci/view/admin_status/index.htm
+                rm /mnt/data/upper/www/index.htm
+                rm /mnt/data/upper/usr/lib/lua/luci/controller/admin/system.lua
+                rm /mnt/data/upper/etc/config/system
+			fi
+			fw_setenv update_flag 15963
+			reboot -f
+			##
+			###
+		fi
+		####
+	else
+	        echo "Can't read bootloader version:"
+	        fw_printenv ver
+	fi
+}
+
+# check -key options
+while getopts "yt" opt; do
+	case $opt in
+		y)
+			try_upgrade
+			exit 0
+			;;
+		t)
+			MODETEST=1
+			try_upgrade
+			exit 0
+			;;
+		\?)
+			echo "Invalid option: -$OPTARG" >&2
+			exit 1
+			;;
+	esac
+done
+
+# without options
+read -p "WARNING: All your configs will be erased, backup them. Don't turn off the device. Continue?(YES/n): " -n 3 -r
+echo	# move to a new line
+if [[ $REPLY == 'YES' ]]
+then
+	try_upgrade				
+else
+	printf "System Upgrade was cancelled. If you want to do it, please, print \"YES\" next time"
+fi

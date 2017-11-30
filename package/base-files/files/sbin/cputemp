@@ -1,0 +1,11 @@
+#!/bin/sh
+while true
+do
+ADCRAW=$(cat /sys/bus/iio/devices/iio:device0/in_temp8_raw);
+ADCOFFSET=1075;
+ADC89DIFF=$(( $ADCRAW - $ADCOFFSET ));
+OUTPUT=$(( $ADC89DIFF * 253 / 1000 ));
+echo "CPU Temperature:" ${OUTPUT}"°C";
+sleep 1
+done
+

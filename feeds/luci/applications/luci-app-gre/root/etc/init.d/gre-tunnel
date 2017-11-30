@@ -1,0 +1,52 @@
+#!/bin/sh /etc/rc.common
+
+USE_PROCD=1
+START=80
+STOP=80
+
+. /lib/functions.sh
+config_load 'gre_tunnel'
+
+start_service() {
+	config_foreach start_tunnel 'gre_tunnel'
+}
+
+start_tunnel(){
+	config_get ENABLED "$1" "enabled" "0"
+	if [ $ENABLED -eq 1 ]; then
+		config_get ifname "$1" "ifname"
+		config_get wan_ifname "$1" "wan_ifname"
+		config_get remote_ip "$1" "remote_ip"
+		config_get remote_network "$1" "remote_network"
+		config_get remote_netmask "$1" "remote_netmask"
+		config_get tunnel_ip "$1" "tunnel_ip"
+		config_get tunnel_netmask "$1" "tunnel_netmask"
+		config_get ttl "$1" "ttl"
+		config_get pmtud "$1" "pmtud" "0"
+		config_get mtu "$1" "mtu"
+		config_get mode "$1" "mode"
+		procd_open_instance
+		procd_set_param command gre-tunnel "$ENABLED" "$ifname" "$wan_ifname" "$mode" "$remote_ip" "$remote_network" "$remote_netmask" "$tunnel_ip" "$tunnel_netmask" "$ttl" "$pmtud" "$mtu"
+		procd_close_instance
+	fi
+}
+
+service_triggers()
+{
+	procd_add_reload_trigger "gre_tunnel"
+}
+
+reload_service() {
+	restart
+}
+
+stop_service() {
+	config_foreach del_tunnel 'gre_tunnel'
+}
+
+del_tunnel() {
+	config_get ifname "$1" "ifname"
+	if [ -n "$ifname" ]; then
+		ip tunnel del "$ifname" 2> /dev/null
+	fi
+}

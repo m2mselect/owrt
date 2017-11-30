@@ -1,0 +1,19 @@
+#!/bin/sh
+
+#echo "ACTION: $ACTION, SUBSYSTEM: $SUBSYSTEM, DEVTYPE: $DEVTYPE, DEVICENAME: $DEVICENAME" >> /tmp/foo.log
+
+[ "$DEVTYPE" = "partition" -a "$ACTION" = "add" ] && {
+    echo "$DEVICENAME" | grep 'mmcblk' || exit 0
+    uptime=$(cat /proc/uptime)
+    uptime=${uptime%%.*}
+    [ "$uptime" -gt "20" ] || sleep 30
+    test -d /mnt/$DEVICENAME || mkdir /mnt/$DEVICENAME
+    mount /dev/$DEVICENAME /mnt/$DEVICENAME
+}
+
+[ "$DEVTYPE" = "partition" -a "$ACTION" = "remove" ] && {
+    echo "$DEVICENAME" | grep 'mmcblk' || exit 0
+    umount /mnt/$DEVICENAME
+    sleep 1
+    rmdir /mnt/$DEVICENAME/
+}

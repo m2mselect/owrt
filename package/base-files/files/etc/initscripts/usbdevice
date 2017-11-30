@@ -1,0 +1,15 @@
+echo 46 > /sys/class/gpio/export
+echo out > /sys/class/gpio/gpio46/direction
+echo 0 > /sys/class/gpio/gpio46/value
+
+echo 23 > /sys/class/gpio/export
+echo out > /sys/class/gpio/gpio23/direction
+echo 1 > /sys/class/gpio/gpio23/value
+
+echo 122 > /sys/class/gpio/export
+echo out > /sys/class/gpio/gpio122/direction
+echo 0 > /sys/class/gpio/gpio122/value
+echo 121 > /sys/class/gpio/export
+echo out > /sys/class/gpio/gpio121/direction
+echo 0 > /sys/class/gpio/gpio121/value
+echo 1 > /sys/class/gpio/gpio121/value
