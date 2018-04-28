@@ -12,14 +12,14 @@ if ! which iconv > /dev/null 2>&1; then
         echo "There is no iconv(1) here! Please, install it."
         exit 40
 fi
-HEADER=`sed -e '/^$/ q' $1`
-BODY=`sed -e '1,/^$/ d' $1`
+HEADER=$(sed -e '/^$/q' $1)
+BODY=$(sed -e '1,/^$/d' $1)
 ALPHABET=""
 # Is body in english?
 if ! echo -n "$BODY" | iconv -t ISO-8859-15 > /dev/null 2>&1; then
         ALPHABET="Alphabet: UCS"
 fi
-FILE=`mktemp /tmp/smsd_XXXXXX`
+FILE=$(mktemp /tmp/smsd_XXXXXX)
 echo "$HEADER" >> $FILE
 # If body isn't in english tell it to smsd
 [ -n "$ALPHABET" ] && echo "$ALPHABET" >> $FILE

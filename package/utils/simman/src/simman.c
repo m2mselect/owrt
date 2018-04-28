@@ -458,8 +458,8 @@ int main(int argc, char **argv)
 				if ((state < 0) || (state != INIT))
 				{
 					LOG("modem not found\n");
-					changeCounter = settings.sw_before_modres;
-					SetSim(active_sim);
+					// changeCounter = settings.sw_before_modres;
+					// SetSim(active_sim);
 				}
 				state = INIT;
 			}

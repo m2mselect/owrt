@@ -6,6 +6,7 @@ opengt
  flash 0.1
 
 :start
+ send "ATE1^m"
  send "AT+CGSN^m"
  waitfor 1 "CGSN"
  get 1 "^m" $s

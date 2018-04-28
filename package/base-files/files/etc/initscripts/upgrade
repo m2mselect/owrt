@@ -4,7 +4,7 @@ mount -t ubifs ubi0_2 /mnt/data
 
 OVRL_BUG=$(dmesg | grep ramoverlay)
 	if [ ! -z "$OVRL_BUG" ]; then
-		fw_setenv update_flag 15963
+		rm -r /overlay/work/
 		reboot
 	fi
 

@@ -1,0 +1,15 @@
+#!/bin/sh
+
+if [ "$1" != "error" ]; then
+	DATE=$(date +%s)
+	touch /tmp/sms$DATE.sms
+	echo "To: $1" >> /tmp/sms$DATE.sms
+	echo "" >> /tmp/sms$DATE.sms
+	echo "$2" >> /tmp/sms$DATE.sms
+	cp /tmp/sms$DATE.sms /var/spool/sms/outgoing/sms$DATE.sms
+	rm /tmp/sms$DATE.sms
+fi
+
+sleep 3
+uci set smscontrol.send.err=""
+uci commit smscontrol

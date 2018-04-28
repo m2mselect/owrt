@@ -11,17 +11,17 @@ case "$ACTION" in
         case "$PRODUCT" in
         $SIM7100)
         if  [ "$version" = "GTRx0" -o "$version" = "GTR30" ] && [ "$DEVPATH" = "/devices/soc0/80080000.ahb/80090000.usb/ci_hdrc.1/usb1/1-1/1-1:1.2" -o "$DEVPATH" = "/devices/soc0/80080000.ahb/80090000.usb/ci_hdrc.1/usb1/1-1/1-1.1/1-1.1:1.2"  ]; then
+                sed -i -e "s/devices = SIM5360/devices = mobile/g" /etc/smsd.conf
                 /etc/init.d/simman stop
                 uci delete network.internet
                 uci set network.wwan0=interface
                 uci set network.wwan0.proto=qmi
                 uci set network.wwan0.device=/dev/cdc-wdm0
                 uci set network.wwan0.apn=internet
+                uci set network.wwan0.autoconnect=0
                 uci set network.wwan0.metric=2
-                uci set simman.core.atdevice=/dev/ttyUSB3
                 uci set simman.core.iface=wwan0
                 uci set simman.core.proto=1
-                uci set simman.info.atdevice=/dev/ttyUSB2
                 echo wwan0 > /sys/class/leds/middle\:net/device_name
                 echo wwan0 > /sys/class/leds/bottom\:act/device_name
                 sed -i -e "s/$version/GTR40/g" /etc/banner
@@ -30,27 +30,13 @@ case "$ACTION" in
                 fw_setenv model GTR40
                 uci commit
                 /etc/init.d/simman restart
-            else if [ "$DEVPATH" = "/devices/soc0/80080000.ahb/80090000.usb/ci_hdrc.1/usb1/1-1/1-1:1.2"  -o "$DEVPATH" = "/devices/soc0/80080000.ahb/80090000.usb/ci_hdrc.1/usb1/1-1/1-1.1/1-1.1:1.2" ]; then            
-                DEVICE_NAME=$(ls /sys$DEVPATH | grep tty)
-                CHECK=$(gcom -d /dev/$DEVICE_NAME -s /etc/simman/gethotswap.gcom)
-                if [ "$CHECK" != "11" ]; then
-                    gcom -d /dev/$DEVICE_NAME -s /etc/simman/sethotswap.gcom                
-                    echo 1 > /sys/class/gpio/gpio83/value
-                    sleep 1
-                    echo 0 > /sys/class/gpio/gpio83/value                
-                    dev=$(ls /dev/ | grep cdc-wdm)
-                    while [ -z "$dev"]; do
-                        sleep 4
-                        dev=$(ls /dev/ | grep cdc-wdm)
-                    done
-                fi
-            fi
         fi
         ;;
 
         $EHS5)
             PROTO_3G=$(uci get simman.core.proto 2>/dev/null)
             if [ "$version" = "GTRx0" -o "$version" = "GTR40" -o "$PROTO_3G" != "0" ] && [ "$DEVPATH" = "/devices/soc0/80080000.ahb/80090000.usb/ci_hdrc.1/usb1/1-1/1-1:1.2" -o "$DEVPATH" = "/devices/soc0/80080000.ahb/80090000.usb/ci_hdrc.1/usb1/1-1/1-1.1/1-1.1:1.2" ]; then
+                sed -i -e "s/devices = SIM5360/devices = mobile/g" /etc/smsd.conf
                 uci delete network.wwan0
                 uci set network.internet=interface
                 uci set network.internet.proto=3g
@@ -58,10 +44,8 @@ case "$ACTION" in
                 uci set network.internet.service=umts
                 uci set network.internet.apn=internet
                 uci set network.internet.metric=2
-                uci set simman.core.atdevice=/dev/ttyACM3
                 uci set simman.core.iface=3g-internet
                 uci set simman.core.proto=0
-                uci set simman.info.atdevice=/dev/ttyACM4
                 echo 3g-internet > /sys/class/leds/middle\:net/device_name
                 echo 3g-internet > /sys/class/leds/bottom\:act/device_name
                 sed -i -e "s/$version/GTR30/g" /etc/banner
@@ -70,6 +54,7 @@ case "$ACTION" in
                 fw_setenv model GTR30
                 uci commit
                 ubus call network reload
+                /etc/init.d/simman restart
             fi
         ;;
 
@@ -77,31 +62,32 @@ case "$ACTION" in
             PROTO_3G=$(uci get simman.core.proto 2>/dev/null)
             if  [ "$version" = "GTRx0" -o "$version" = "GTR40" -o "$PROTO_3G" != "2" ] && [ "$DEVPATH" = "/devices/soc0/80080000.ahb/80090000.usb/ci_hdrc.1/usb1/1-1/1-1:1.2" -o "$DEVPATH" = "/devices/soc0/80080000.ahb/80090000.usb/ci_hdrc.1/usb1/1-1/1-1.1/1-1.1:1.2"  ]; then
             uci delete network.wwan0
-                uci set network.internet=interface
-                uci set network.internet.proto=3g
-                uci set network.internet.device=/dev/ttyUSB3
-                uci set network.internet.service=umts
-                uci set network.internet.apn=internet
-                uci set network.internet.metric=2
-                uci set simman.core.atdevice=/dev/ttyUSB2
-                uci set simman.core.iface=3g-internet
+                sed -i -e "s/devices = mobile/devices = SIM5360/g" /etc/smsd.conf
+                /etc/init.d/simman stop
+                uci delete network.internet
+                uci set network.wwan0=interface
+                uci set network.wwan0.proto=qmi
+                uci set network.wwan0.device=/dev/cdc-wdm0
+                uci set network.wwan0.apn=internet
+                uci set network.wwan0.autoconnect=0
+                uci set network.wwan0.metric=2
+                uci set simman.core.iface=wwan0
                 uci set simman.core.proto=2
-                uci set simman.info.atdevice=/dev/ttyUSB2
-                echo 3g-internet > /sys/class/leds/middle\:net/device_name
-                echo 3g-internet > /sys/class/leds/bottom\:act/device_name
-                sed -i -e "/SGAUTH/d" /etc/chatscripts/3g.chat
+                echo wwan0 > /sys/class/leds/middle\:net/device_name
+                echo wwan0 > /sys/class/leds/bottom\:act/device_name
                 sed -i -e "s/$version/GTR30/g" /etc/banner
                 sed -i -e "s/$version/GTR30/g" /etc/config/system
-                sed -i -e "s/wwan0/3g-internet/g" /etc/config/system
+                sed -i -e "s/3g-internet/wwan0/g" /etc/config/system
                 fw_setenv model GTR30
                 uci commit
-                ubus call network reload
+                /etc/init.d/simman restart
             fi
         ;;
         
         $SIM5300)
             PROTO_3G=$(uci get simman.core.proto 2>/dev/null)
             if [ "$version" = "GTRx0" -o "$version" = "GTR40" -o "$PROTO_3G" != "3" ] && [ "$DEVPATH" = "/devices/soc0/80080000.ahb/80090000.usb/ci_hdrc.1/usb1/1-1/1-1:1.2" -o "$DEVPATH" = "/devices/soc0/80080000.ahb/80090000.usb/ci_hdrc.1/usb1/1-1/1-1.1/1-1.1:1.2" ]; then
+                sed -i -e "s/devices = SIM5360/devices = mobile/g" /etc/smsd.conf
                 uci delete network.wwan0
                 uci set network.internet=interface
                 uci set network.internet.proto=3g
@@ -109,19 +95,18 @@ case "$ACTION" in
                 uci set network.internet.service=umts
                 uci set network.internet.apn=internet
                 uci set network.internet.metric=2
-                uci set simman.core.atdevice=/dev/ttyACM3
                 uci set simman.core.iface=3g-internet
                 uci set simman.core.proto=3
-                uci set simman.info.atdevice=/dev/ttyACM3
                 echo 3g-internet > /sys/class/leds/middle\:net/device_name
                 echo 3g-internet > /sys/class/leds/bottom\:act/device_name
-                sed -i -e "/SGAUTH/d" /etc/chatscripts/3g.chat
+                sed -i -e "s/\\\^S/+X/g" /etc/chatscripts/3g.chat
                 sed -i -e "s/$version/GTR30/g" /etc/banner
                 sed -i -e "s/$version/GTR30/g" /etc/config/system
                 sed -i -e "s/wwan0/3g-internet/g" /etc/config/system
                 fw_setenv model GTR30
                 uci commit
                 ubus call network reload
+                /etc/init.d/simman restart
             fi
         ;;
         esac

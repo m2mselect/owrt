@@ -3,7 +3,7 @@
 
 local map, section, net = ...
 
-local device, apn, pincode, username, password, modes
+local device, apn, pincode, username, password, modes, autoconnect
 local auth, ipv6
 
 
@@ -25,6 +25,9 @@ modes:value("all", "All")
 modes:value("lte", "LTE only")
 modes:value("umts", "UMTS only")
 modes:value("gsm", "GPRS only")
+
+autoconnect = section:taboption("general", Flag, "autoconnect", translate("Keep connect"))
+  autoconnect.rmempty = false
 
 local simman = map.uci:get("simman", "core", "enabled") or "0"
 if simman == "0" then

@@ -18,8 +18,8 @@ msgstr ""
 msgid "simman"
 msgstr "simman"
 
-msgid "SIM manager for 3g modem"
-msgstr "SIM manager for 3g modem"
+msgid "SIM manager for modem"
+msgstr "SIM manager for modem"
 
 msgid "General settings"
 msgstr "General settings"

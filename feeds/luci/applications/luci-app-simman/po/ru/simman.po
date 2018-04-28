@@ -18,8 +18,8 @@ msgstr ""
 msgid "Simman"
 msgstr "Менеджер SIM"
 
-msgid "SIM manager for 3g modem"
-msgstr "Менеджер SIM-карт 3G модема"
+msgid "SIM manager for modem"
+msgstr "Менеджер SIM-карт модема"
 
 msgid "General settings"
 msgstr "Настройки"

@@ -1,16 +1,28 @@
 case "$ACTION" in
     add)
-        # start process
-        # only pl2303 devices are handled
-        if [ "$PRODUCT" = "67b/2303/300" ] && [ "$TYPE" = "0/0/0" ] && [ "$INTERFACE" = "255/0/0" ]; then
-            sleep 3 && /etc/init.d/gpsd start
+        GPS=$(echo $DEVPATH | grep "1:1.1")
+        if [ "$PRODUCT" = "1e0e/9001/232" ] && [ ! -z "$GPS" ]; then
+            GPSPORT=$(uci get simman.core.gpsdevice)
+            DEVICE_NAME="/dev/$(ls /sys/$DEVPATH | grep tty)"
+            if [ "$GPSPORT" != "/dev/ttyAPP1" ]; then
+                rm /dev/gps0
+                ln -s $DEVICE_NAME /dev/gps0
+                uci set simman.core.gpsdevice=$DEVICE_NAME
+                ATPORT=$(uci get simman.info.atdevice)
+                gcom -d $ATPORT -s /etc/simman/gpson.gcom
+                /etc/init.d/gpsd restart
+                /etc/init.d/ntpd restart
+            fi
         fi
         ;;
     remove)
-        # stop process
-        # only pl2303 devices are handled
-        if [ "$PRODUCT" = "67b/2303/300" ] && [ "$TYPE" = "0/0/0" ] && [ "$INTERFACE" = "255/0/0" ]; then
-            /etc/init.d/gpsd stop
+        GPS=$(echo $DEVPATH | grep "1:1.1")
+        if [ "$PRODUCT" = "1e0e/9001/232" ] && [ ! -z "$GPS" ]; then
+            GPSPORT=$(uci get simman.core.gpsdevice)
+            DEVICE_NAME="/dev/$(ls /sys/$DEVPATH | grep tty)"
+            if [ "$GPSPORT" != "/dev/ttyAPP1" ]; then
+                rm /dev/gps0
+            fi
         fi
         ;;
 esac

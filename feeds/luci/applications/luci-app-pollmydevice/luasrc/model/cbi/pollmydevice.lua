@@ -10,6 +10,8 @@ m = Map("pollmydevice", translate("PollMyDevice"), translate("TCP to RS232/RS485
 s = m:section(NamedSection, arg[1], "pollmydevice", translate("Utility Settings"))
 s.addremove = false
 
+devicename = s:option(DummyValue, "devicename", translate("Port"))
+
 mode = s:option(ListValue, "mode", translate("Mode"))
   mode.default = "disabled"
   mode:value("disabled")
@@ -121,5 +123,23 @@ client_auth = s:option(Flag, "client_auth", translate("Client Authentification")
 adtid = s:option(DummyValue, "adtid",  translate("Device ID"))
   --client_auth.rmempty = false
   adtid:depends("mode","client")
+
+coff = s:option(Button, "coff", translate("Disable console port"), translate("Save the changes. The router will reboot"))  
+  coff.title      = translate("Disable console port")
+  coff.inputtitle = translate("Disable")
+  coff.inputstyle = "apply"
+  coff:depends("devicename","/dev/com0")
+  function coff.write()
+     luci.sys.call("/etc/pollmydevice/console disable")
+  end
+
+con = s:option(Button, "con", translate("Enable console port"), translate("Save the changes. The router will reboot"))  
+  con.title      = translate("Enable console port")
+  con.inputtitle = translate("Enable")
+  con.inputstyle = "apply"
+  con:depends("devicename","/dev/com0")
+  function con.write()
+     luci.sys.call("/etc/pollmydevice/console enable")
+  end
 
 return m

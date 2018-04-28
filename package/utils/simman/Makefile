@@ -56,6 +56,7 @@ define Package/simman/install
 	$(CP) ./files/*.gcom $(1)/etc/simman
 	$(INSTALL_DIR) $(1)/etc/hotplug.d/usb
 	$(INSTALL_DATA) ./files/simman.hotplug $(1)/etc/hotplug.d/usb/12-modem
+	$(INSTALL_DATA) ./files/scmux.hotplug $(1)/etc/hotplug.d/usb/13-scmux
 endef
 
 $(eval $(call BuildPackage,simman))

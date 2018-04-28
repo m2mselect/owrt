@@ -44,3 +44,12 @@ msgstr "Авторизация"
 
 msgid "Use Authentification by ID"
 msgstr "Использовать авторизацию по Device ID"
+
+msgid "Save the changes. The router will reboot"
+msgstr "Сохраните настройки. Роутер перезагрузится"
+
+msgid "Disable console port"
+msgstr "Отключить консоль"
+
+msgid "Enable console port"
+msgstr "Включить консоль"

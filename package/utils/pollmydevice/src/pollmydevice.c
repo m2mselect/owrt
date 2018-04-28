@@ -1156,6 +1156,7 @@ void *ClientThreadFunc(void *args)
                 epollConfig.data.fd = threadFD->mainSocket;
                 epoll_ctl(threadFD->epollFD, EPOLL_CTL_DEL, threadFD->mainSocket, &epollConfig);
                 serverAvailable = 0;
+				autorized = 0;
 
                 // reconnect
                 threadFD->mainSocket = socket(AF_INET, SOCK_STREAM, 0);
@@ -1749,6 +1750,8 @@ int FormAuthAnswer(char *dataBuffer, long long int adtID)
     dataBuffer[5] = 0x01; // auth counter
 
     memcpy(&dataBuffer[6], &stringadtID[0], 15);   // copy imei to buffer
+	
+	dataBuffer[67] = 0x01;	// main channel auth
 
     crc = Crc16Block((uint8_t *)&dataBuffer[1], 68);
     len_out = 69;

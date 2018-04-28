@@ -46,6 +46,7 @@ start() {
 	mkdir -p $WRT_SPOOL/sms/checked
 	mkdir -p $WRT_SPOOL/sms/failed
 	mkdir -p $WRT_SPOOL/sms/sent
+	mkdir -p $WRT_SPOOL/sms/calls
 
 	echo -n "Starting SMS Daemon: "
 	MSG="."

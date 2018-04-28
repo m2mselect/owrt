@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2006-2009 OpenWrt.org
+# Copyright (C) 2006-2015 OpenWrt.org
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
@@ -9,14 +9,16 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=libiconv-full
 PKG_VERSION:=1.11.1
-PKG_RELEASE:=1
+PKG_RELEASE:=3
 
-PKG_MAINTAINER:=Jo-Philipp Wich <jow@openwrt.org>
+PKG_MAINTAINER:=Jo-Philipp Wich <jo@mein.io>
 
 PKG_SOURCE:=libiconv-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=@GNU/libiconv
-PKG_MD5SUM:=d42b97f6ef5dd0ba4469d520ed732fed
+PKG_HASH:=e78c347a1a0cb15f2648519e9799151f4b4a934b61ad9ee7424478efe2b8257f
 PKG_BUILD_DIR:=$(BUILD_DIR)/libiconv-$(PKG_VERSION)
+PKG_LICENSE:=LGPL-2.0
+PKG_LICENSE_FILES:=COPYING.LIB
 
 PKG_FIXUP:=patch-libtool
 
@@ -49,7 +51,7 @@ define Package/iconv
   TITLE+= utility
 endef
 
-TARGET_CFLAGS += $(FPIC) -DUSE_DOS
+TARGET_CFLAGS += $(FPIC) -DUSE_DOS -std=gnu89
 
 CONFIGURE_ARGS += \
 	--enable-shared \

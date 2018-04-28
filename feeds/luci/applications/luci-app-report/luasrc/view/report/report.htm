@@ -1,0 +1,81 @@
+<%+header%>
+
+<h2><a id="report" name="report"><%:Create report%></a></h2>
+
+<fieldset class="cbi-section">
+	<legend><%:Select the required options%></legend>
+	<form method="post" action="<%=REQUEST_URI%>" enctype="multipart/form-data">
+		<div class="cbi-section-descr"><%:Click "Generate archive" to download a tar archive of the selected options. It may take several minutes.%></div>
+		<div class="cbi-section-node">	
+			<div class="cbi-value cbi-value-last">
+				
+				<label class="cbi-value-title" for="dmesg"><%:Kernel log%>:</label>
+				<div class="cbi-value-field">
+					<input type="checkbox" name="dmesg" id="dmesg" checked />
+				</div>
+
+<!-- 			<label class="cbi-value-title" for="syslog"><%:System log%>:</label>
+				<div class="cbi-value-field">
+					<input type="checkbox" name="syslog" id="syslog" checked />
+				</div> -->
+
+				<label class="cbi-value-title" for="sslog"><%:System log%>:</label>
+				<div class="cbi-value-field">
+					<input type="checkbox" name="sslog" id="sslog" checked />
+				</div>
+
+				<label class="cbi-value-title" for="network"><%:Network config%>:</label>
+				<div class="cbi-value-field">
+					<input type="checkbox" name="network" id="network" checked />
+				</div>
+
+				<label class="cbi-value-title" for="simman"><%:SIM manager config%>:</label>
+				<div class="cbi-value-field">
+					<input type="checkbox" name="simman" id="simman" checked />
+				</div>
+
+				<label class="cbi-value-title" for="openvpn"><%:OpenVPN config%>:</label>
+				<div class="cbi-value-field">
+					<input type="checkbox" name="openvpn" id="openvpn" checked />
+				</div>
+
+				<label class="cbi-value-title" for="mwan"><%:MultiWAN config%>:</label>
+				<div class="cbi-value-field">
+					<input type="checkbox" name="mwan" id="mwan" checked />
+				</div>
+
+				<label class="cbi-value-title" for="pollmydevice"><%:Pollmydevice config%>:</label>
+				<div class="cbi-value-field">
+					<input type="checkbox" name="pollmydevice" id="pollmydevice" checked />
+				</div>
+
+				<label class="cbi-value-title" for="ntp"><%:NTP config%>:</label>
+				<div class="cbi-value-field">
+					<input type="checkbox" name="ntp" id="ntp" checked />
+				</div>
+
+				<label class="cbi-value-title" for="sms"><%:SMScontrol config%>:</label>
+				<div class="cbi-value-field">
+					<input type="checkbox" name="sms" id="sms" checked />
+				</div>
+
+				<label class="cbi-value-title" for="snmp"><%:SNMP config%>:</label>
+				<div class="cbi-value-field">
+					<input type="checkbox" name="snmp" id="snmp" checked />
+				</div>
+
+			</div>
+		</div>
+
+		<div class="cbi-section-node">				
+			<div class="cbi-value cbi-value-last">
+				<label class="cbi-value-title" for="image"><%:Download report%>:</label>
+				<div class="cbi-value-field">
+					<input class="cbi-button cbi-button-apply" type="submit" name="report" value="<%:Generate archive%>" />
+				</div>
+			</div>
+		</div>
+	</form>
+</fieldset>
+
+<%+footer%>

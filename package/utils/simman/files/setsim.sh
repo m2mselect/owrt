@@ -81,6 +81,7 @@ ATDEVICE=$(uci -q get simman.core.atdevice)
 	logger -t $tag "Not set ATDEVICE" && exit 0
 }
 
+GPSPORT=$(uci -q get simman.core.gpsdevice)
 
 # GPIO ports configure 
 if [ ! -d "$GPIO_PATH/gpio$GSMPOW_PIN" ]; then
@@ -186,17 +187,24 @@ else
  uci -q set network.$iface.password=$pass
 fi
 
+sleep 1
+
 # at+cfun=0 for SIM5300
-if [ "$proto" == "3" -a "$pow" -ne "1" ]; then
+if [ "$proto" == "3" -a "$pow" -ne "1" ]; then	
 	$CONFIG_DIR/setfun.sh -f 0
 fi
 
 # power down for SIM5360
-if [ "$proto" == "2" ]; then	
-  	echo "0" > $GPIO_PATH/gpio$PWRKEY_PIN/value
-  	sleep 1
-  	echo "1" > $GPIO_PATH/gpio$PWRKEY_PIN/value
-  	sleep 3
+if [ "$proto" == "2" -a "$pow" -ne "1" ]; then
+	dev=$(ls $ATDEVICE 2>/dev/null)
+	if [ -n "$dev" ]; then
+		logger -t $tag "power down for SIM5360"
+		/etc/init.d/smstools3 stop > /dev/null &
+  		echo "0" > $GPIO_PATH/gpio$PWRKEY_PIN/value
+  		sleep 1
+  		echo "1" > $GPIO_PATH/gpio$PWRKEY_PIN/value
+  		sleep 3
+  	fi
 fi
 
 # Set sim card
@@ -209,6 +217,14 @@ if [ "$mode" == "0" ]; then
  if [ "$pow" == "1" ]; then
 
   logger -t $tag "Reset pin toggle"
+
+  if [ -n "$GPSPORT" -a "$GPSPORT" != "/dev/ttyAPP1" ]; then
+  		/etc/init.d/gpsd stop
+  		/etc/init.d/ntpd stop
+  fi
+
+  kill $(pidof cmux)
+
   # release SIMADDR
   echo "0" > $GPIO_PATH/gpio$SIMADDR_PIN/value  
 
@@ -223,21 +239,19 @@ if [ "$mode" == "0" ]; then
 
   sleep 4
   
-  	dev=$(ls /dev/ | grep cdc-wdm)
-  	[ -z "$dev" ] && dev=$(ls /dev/ | grep ttyACM0)
-  	while [ -z "$dev"]; do
+  	dev=$(ls $ATDEVICE 2>/dev/null)
+  	while [ -z "$dev" ]; do
   		sleep 4
-  		dev=$(ls /dev/ | grep cdc-wdm)
-  		[ -z "$dev" ] && dev=$(ls /dev/ | grep ttyACM0)
+  		dev=$(ls $ATDEVICE 2>/dev/null)
   	done
-
+  	sim="0"
 
  else
   retry=0
 
 
 
-  while [ $retry -lt 10 -o "$proto" !== "2" ]; do
+  while [ $retry -lt 10 -a "$proto" != "2" ]; do
      retry=`expr $retry + 1`
 
      reg=$($CONFIG_DIR/getreg.sh)
@@ -271,17 +285,16 @@ if [ "$proto" == "3" -a "$pow" -ne "1" ]; then
 fi
 # power up for SIM5360
 if [ "$proto" == "2" -a "$pow" -ne "1" ]; then
+	logger -t $tag "power up for SIM5360"
 	counter=0
   	echo "0" > $GPIO_PATH/gpio$PWRKEY_PIN/value
   	usleep 50000
   	echo "1" > $GPIO_PATH/gpio$PWRKEY_PIN/value
   	sleep 3
-  	dev=$(ls /dev/ | grep cdc-wdm)
-  	[ -z "$dev" ] && dev=$(ls /dev/ | grep ttyACM0)
+  	dev=$(ls $ATDEVICE 2>/dev/null)
   	while [ -z "$dev" ]; do
   		sleep 2
-  		dev=$(ls /dev/ | grep cdc-wdm)
-  		[ -z "$dev" ] && dev=$(ls /dev/ | grep ttyACM0)
+  		dev=$(ls $ATDEVICE 2>/dev/null)
   		counter=$(($counter + 1))
   		if [ "$counter" == "15" ]; then
   			echo "0" > $GPIO_PATH/gpio$PWRKEY_PIN/value
@@ -290,7 +303,10 @@ if [ "$proto" == "2" -a "$pow" -ne "1" ]; then
   			counter=0
   		fi
   	done
+  	logger -t $tag "SIM5360 powered up"
 fi
+
+sleep 10 && /etc/init.d/smstools3 restart > /dev/null &
 
 # store uci changes
 uci commit 

@@ -22,7 +22,7 @@ function split(text, delim)
     return result
 end
 
-m = Map("simman", "Simman", translate("SIM manager for 3g modem"))
+m = Map("simman", "Simman", translate("SIM manager for modem"))
 
 --- General settings ---
 section_gen = m:section(NamedSection, "core", "simman", translate("General settings"))  -- create general section

@@ -3,7 +3,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=pollmydevice
 PKG_VERSION:=1
-PKG_RELEASE:=1
+PKG_RELEASE:=3
 PKG_BUILD_DIR:=$(BUILD_DIR)/pollmydevice
 
 include $(INCLUDE_DIR)/package.mk
@@ -35,6 +35,7 @@ define Package/pollmydevice/install
 	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_BIN) ./files/pollmydevice.init $(1)/etc/init.d/pollmydevice
 	$(INSTALL_DIR) $(1)/etc/pollmydevice
+	$(CP) ./files/console $(1)/etc/pollmydevice/console
 endef
 
 $(eval $(call BuildPackage,pollmydevice))

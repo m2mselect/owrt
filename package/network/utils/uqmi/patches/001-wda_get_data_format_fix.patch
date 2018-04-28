@@ -1,0 +1,11 @@
+--- a/commands-wda.c
++++ b/commands-wda.c
+@@ -61,7 +61,7 @@ cmd_wda_get_data_format_cb(struct qmi_dev *qmi, struct qmi_request *req, struct
+ 
+ 	qmi_parse_wda_get_data_format_response(msg, &res);
+ 	for (i = 0; i < ARRAY_SIZE(link_modes); i++) {
+-		if (link_modes[i].val != res.data.link_layer_protocol)
++		if (link_modes[i].val != (res.data.link_layer_protocol&0x03))
+ 			continue;
+ 
+ 		name = link_modes[i].name;

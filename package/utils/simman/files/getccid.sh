@@ -38,8 +38,7 @@ if [ "$proto" = "0" ]; then
 	CCID=$(gcom -d $device -s $SCRIPT_CCID)
 elif [ "$proto" = "3" ]; then
 	CCID=$(gcom -d $device -s $SCRIPT_CCID1)
-	CCID=${CCID//F/}
-	CCID="89$CCID"
+	[ -n "$CCID" ] && CCID="89${CCID//F/}"
 else
 	CCID=$(gcom -d $device -s $SCRIPT_CICCID 2> /dev/null)
     CCID=${CCID//F/}
