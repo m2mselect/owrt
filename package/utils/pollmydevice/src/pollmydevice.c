@@ -611,6 +611,7 @@ void *ServerThreadFunc(void *args)
                         	}
                             if (!deviceConfig.quiet)
                         	    LOG("Connection closed\n");
+                            lastActiveConnSocket = -1;
                         }else  lastActiveConnSocket = eventSource;
                     }
                     else
@@ -629,6 +630,7 @@ void *ServerThreadFunc(void *args)
                     }
                     if (!deviceConfig.quiet)
                         LOG("Connection closed\n");
+                    lastActiveConnSocket = -1;
                 }
             }
 

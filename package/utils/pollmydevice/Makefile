@@ -3,7 +3,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=pollmydevice
 PKG_VERSION:=1
-PKG_RELEASE:=4
+PKG_RELEASE:=5
 PKG_BUILD_DIR:=$(BUILD_DIR)/pollmydevice
 
 include $(INCLUDE_DIR)/package.mk
