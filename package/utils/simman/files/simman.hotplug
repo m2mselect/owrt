@@ -28,6 +28,7 @@ case "$ACTION" in
                 sed -i -e "s/$version/GTR40/g" /etc/banner
                 sed -i -e "s/$version/GTR40/g" /etc/config/system
                 sed -i -e "s/3g-internet/wwan0/g" /etc/config/system
+                fw_setenv model GTR40
                 uci commit
                 /etc/init.d/simman restart
             fi
