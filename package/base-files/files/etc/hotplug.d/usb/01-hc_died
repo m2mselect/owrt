@@ -1,0 +1,19 @@
+# USB Host Controller quirk
+
+#echo "$(date) -- ACT: $ACTION, PROD: $PRODUCT, DEVPTH: $DEVPATH, INTERF: $INTERFACE" >> /tmp/foo.log
+
+[ "$ACTION" = "remove" -a "$DEVICENAME" = "1-1" ] && {
+
+	HC_DIED_COUNT=$(dmesg | grep "HC died" | wc -l)
+	HC_RESTORED_COUNT=$(dmesg | grep "HC restored" | wc -l)
+
+	[ "$HC_DIED_COUNT" -ne "$HC_RESTORED_COUNT" ] && {
+		echo ci_hdrc.1 > /sys/bus/platform/drivers/ci_hdrc/unbind
+		sleep 1
+		echo ci_hdrc.1 > /sys/bus/platform/drivers/ci_hdrc/bind
+		echo "ci_hdrc ci_hdrc.1: HC restored" > /dev/kmsg
+		sleep 3 && /etc/simman/setsim.sh -p &
+		[ "$(uci get simman.core.proto)" -eq "1" ] && sleep 60 && /etc/init.d/network restart &
+#		/etc/init.d/simman restart
+	}
+}

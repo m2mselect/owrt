@@ -2,6 +2,7 @@ case "$ACTION" in
     add)
         #echo "ADDED: PRODUCT: $PRODUCT, TYPE: $TYPE, DEVPATH: $DEVPATH, INTERFACE: $INTERFACE" >> /tmp/foo.log        
         SIM7100="1e0e/9001/232"
+        SIM7600="1e0e/9001/318"
         SIM5360="5c6/9000/0"
         EHS5="1e2d/58/1730"
         SIM5300="1e0e/20/1730"
@@ -10,6 +11,27 @@ case "$ACTION" in
         $SIM7100)
             if  [ "$DEVPATH" = "/devices/soc0/80080000.ahb/80090000.usb/ci_hdrc.1/usb1/1-1/1-1:1.2" -o "$DEVPATH" = "/devices/soc0/80080000.ahb/80090000.usb/ci_hdrc.1/usb1/1-1/1-1.1/1-1.1:1.2"  ]; then
                 DEVICE_NAME=$(ls /sys$DEVPATH | grep tty)
+                CHECK=$(gcom -d /dev/$DEVICE_NAME -s /etc/simman/gethotswap.gcom)
+                if [ "$CHECK" != "11" ]; then
+                    gcom -d /dev/$DEVICE_NAME -s /etc/simman/sethotswap.gcom                
+                    echo 1 > /sys/class/gpio/gpio83/value
+                    sleep 1
+                    echo 0 > /sys/class/gpio/gpio83/value                
+                    dev=$(ls /dev/ | grep cdc-wdm)
+                    while [ -z "$dev"]; do
+                        sleep 4
+                        dev=$(ls /dev/ | grep cdc-wdm)
+                    done
+                else                    
+                    cmux --device /dev/$DEVICE_NAME --type EHS5 --nodes 4
+                fi
+            fi
+        ;;
+
+        $SIM7600)
+            if  [ "$DEVPATH" = "/devices/soc0/80080000.ahb/80090000.usb/ci_hdrc.1/usb1/1-1/1-1:1.2" -o "$DEVPATH" = "/devices/soc0/80080000.ahb/80090000.usb/ci_hdrc.1/usb1/1-1/1-1.1/1-1.1:1.2"  ]; then
+                DEVICE_NAME=$(ls /sys$DEVPATH | grep tty)
+                sleep 2
                 CHECK=$(gcom -d /dev/$DEVICE_NAME -s /etc/simman/gethotswap.gcom)
                 if [ "$CHECK" != "11" ]; then
                     gcom -d /dev/$DEVICE_NAME -s /etc/simman/sethotswap.gcom                

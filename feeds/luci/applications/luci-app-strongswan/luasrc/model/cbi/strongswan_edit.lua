@@ -124,7 +124,11 @@ o = s:option( Value, "dpd_delay", translate("Delay (sec)"), translate("Delay bet
 o:depends({dpd_enable="1"})
 o.datatype = "lengthvalidation(0,64,'^[0-9]+$')"
 
-remip = s:option(DynamicList, "rightsubnet", translate("IP address/Subnet mask"),
+o = s:option(Value, "local_subnet", translate("Local IP address/Subnet mask"))
+	o.datatype = "ipaddr"
+	o.placeholder = "192.168.88.0/24"
+
+remip = s:option(DynamicList, "rightsubnet", translate("Remote IP address/Subnet mask"),
 	translate("Remote network secure group IP address and mask used to determine to what subnet an IP address belongs to. Range [0 - 32]. IP should differ from device LAN IP"))
 	remip.datatype = "ipaddr"
 

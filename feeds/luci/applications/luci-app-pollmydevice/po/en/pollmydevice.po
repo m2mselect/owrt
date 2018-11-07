@@ -51,3 +51,12 @@ msgstr "Password"
 
 msgid "SIM2 settings"
 msgstr "SIM2 settings"
+
+msgid "Disabled"
+msgstr "Disabled"
+
+msgid "Disable"
+msgstr "Disable"
+
+msgid "Enable"
+msgstr "Enable"

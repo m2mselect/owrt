@@ -66,6 +66,8 @@ iface = section_gen:option(Value, "iface",  translate("Ping iface name"))
 testip = section_gen:option(DynamicList, "testip",  translate("IP address of remote servers"))
   testip.datatype = "ipaddr"
   testip.cast = "string"
+  testip.rmempty = false
+  testip.optional = false
 
 sw_before_modres = section_gen:option(Value, "sw_before_modres",  translate("Switches before modem reset"),  translate("0 - not used"))
   sw_before_modres.default = 0

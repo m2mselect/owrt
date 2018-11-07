@@ -221,13 +221,34 @@ mwan3_set_policy()
 	fi
 }
 
+mwan3_check_comeback()
+{
+	#FIXME start
+	local member comeback interface
+
+	member=$1
+	comeback=$2
+	config_get interface $1 interface
+	if [ "$comeback" != "none" ]; then
+		if [ "$comeback" != "$member" ]; then
+			if [ "$interface" != "$INTERFACE" -a $ACTION == "ifup" ]; then
+				ubus call network.interface.$interface down
+				ubus call network.interface.$interface up
+				#$LOG warn "Comeback: $comeback; Member: $member; Interface: $interface"
+			fi
+		fi
+	fi
+	#FIXME end
+}
+
 mwan3_set_policies_iptables()
 {
-	local last_resort lowest_metric policy total_weight
+	local last_resort lowest_metric policy total_weight comeback
 
 	policy=$1
 
 	config_get last_resort $1 last_resort unreachable
+	config_get comeback $1 comeback none
 
 	if [ "$policy" != $(echo "$policy" | cut -c1-15) ]; then
 		$LOG warn "Policy $policy exceeds max of 15 chars. Not setting policy" && return 0
@@ -255,6 +276,7 @@ mwan3_set_policies_iptables()
 	total_weight=0
 
 	config_list_foreach $policy use_member mwan3_set_policy
+	config_list_foreach $policy use_member mwan3_check_comeback $comeback
 }
 
 mwan3_set_sticky_iptables()

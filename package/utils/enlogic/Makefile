@@ -6,7 +6,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=enlogic
 PKG_VERSION:=1
-PKG_RELEASE:=18
+PKG_RELEASE:=21
 PKG_BUILD_DIR:= $(BUILD_DIR)/$(PKG_NAME)
 PKG_MAINTAINER:=www.smart-grid.ru
 PKGPP:=/usr/share
@@ -21,7 +21,7 @@ define Package/enlogic
 	SECTION:=utils
 	CATEGORY:=Utilities
 	TITLE:=enlogic
-	DEPENDS:=+zlib +libpthread +libc
+	DEPENDS:=+libc +zlib +libpthread
 endef
 
 define Package/enlogic/description
@@ -33,9 +33,7 @@ define Build/Prepare
 	mkdir -p $(PKG_BUILD_DIR)/defcfg
 	$(CP) ./src/* $(PKG_BUILD_DIR)/
 	#mkdir -p $(PKG_BUILD_DIR)
-#	$(CP) ./usr/* $(PKG_BUILD_DIR)/
-	$(CP) ./defcfg/* $(PKG_BUILD_DIR)/defcfg/
-#	$(CP) ./init.d/* $(PKG_BUILD_DIR)/
+	$(CP) ./src/defcfg/* $(PKG_BUILD_DIR)/defcfg/
 endef
 
 
@@ -45,25 +43,36 @@ endef
 define Package/enlogic/preinst
 #!/bin/sh
 
-if [ -f $(PKGPE)/enlogic.cfg ]; then
-	mv $(PKGPE)/enlogic.cfg $(PKGPE)/enlogic.cfg.bak
-fi
+tobak()
+{
+	if [ -f $(PKGPE)/$1 ]; then
+		mv $(PKGPE)/$1 $(PKGPE)/$1.bak
+	fi
+}
+
+tobak enlogic.cfg
+tobak config.bin
+tobak cfgxml
 endef
 
 define Package/enlogic/postinst
 #!/bin/sh
 
-if [ -f $(PKGPE)/enlogic.cfg.bak ]; then
-	mv $(PKGPE)/enlogic.cfg.bak $(PKGPE)/enlogic.cfg
-fi
+frombak()
+{
+	if [ -f $(PKGPE)/$1.bak ]; then
+		mv $(PKGPE)/$1.bak $(PKGPE)/$1
+	fi
+}
+
+frombak enlogic.cfg
+frombak config.bin
+frombak cfgxml
 endef
 
 define Package/enlogic/install
 	$(INSTALL_DIR) $(1)/$(PKGPE)
 	$(INSTALL_DIR) $(1)/$(PKGPE)/defcfg
-#	$(INSTALL_DIR) $(1)/usr/lib
-#	$(INSTALL_DATA) $(PKG_BUILD_DIR)/libz.so $(1)/$(PKGPE)
-#	$(INSTALL_DATA) $(PKG_BUILD_DIR)/libc.so $(1)/$(PKGPE)
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/enlogic $(1)/$(PKGPE)
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/start $(1)/$(PKGPE)
 	$(INSTALL_DATA) $(PKG_BUILD_DIR)/cfgxml $(1)/$(PKGPE)
@@ -75,7 +84,7 @@ define Package/enlogic/install
 	$(INSTALL_DATA) $(PKG_BUILD_DIR)/defcfg/config.bin $(1)/$(PKGPE)/defcfg
 	$(INSTALL_DATA) $(PKG_BUILD_DIR)/defcfg/cfgxml $(1)/$(PKGPE)/defcfg
 	$(INSTALL_DIR) $(1)/etc/init.d
-	$(INSTALL_BIN) ./files/enlogic.sh.init $(1)/etc/init.d/enlogic.sh
+	$(INSTALL_BIN) ./init.d/enlogic.sh $(1)/etc/init.d/enlogic.sh
 endef
 
 

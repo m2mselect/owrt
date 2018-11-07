@@ -187,6 +187,8 @@ else
  uci -q set network.$iface.password=$pass
 fi
 
+/etc/init.d/smstools3 stop > /dev/null &
+
 sleep 1
 
 # at+cfun=0 for SIM5300

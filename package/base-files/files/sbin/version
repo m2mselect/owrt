@@ -1,0 +1,2 @@
+#!/bin/sh
+grep Build /etc/banner | awk -F 'v.' '{print $2}'

@@ -4,6 +4,7 @@ case "$ACTION" in
         version=$(cat /etc/banner | grep "GTR" | awk -F' ' '{print $3}')
         
         SIM7100="1e0e/9001/232"
+        SIM7600="1e0e/9001/318"
         SIM5360="5c6/9000/0"
         EHS5="1e2d/58/1730"
         SIM5300="1e0e/20/1730"
@@ -11,6 +12,29 @@ case "$ACTION" in
         case "$PRODUCT" in
         $SIM7100)
         if  [ "$version" = "GTRx0" -o "$version" = "GTR30" ] && [ "$DEVPATH" = "/devices/soc0/80080000.ahb/80090000.usb/ci_hdrc.1/usb1/1-1/1-1:1.2" -o "$DEVPATH" = "/devices/soc0/80080000.ahb/80090000.usb/ci_hdrc.1/usb1/1-1/1-1.1/1-1.1:1.2"  ]; then
+                sed -i -e "s/devices = SIM5360/devices = mobile/g" /etc/smsd.conf
+                /etc/init.d/simman stop
+                uci delete network.internet
+                uci set network.wwan0=interface
+                uci set network.wwan0.proto=qmi
+                uci set network.wwan0.device=/dev/cdc-wdm0
+                uci set network.wwan0.apn=internet
+                uci set network.wwan0.autoconnect=0
+                uci set network.wwan0.metric=2
+                uci set simman.core.iface=wwan0
+                uci set simman.core.proto=1
+                echo wwan0 > /sys/class/leds/middle\:net/device_name
+                echo wwan0 > /sys/class/leds/bottom\:act/device_name
+                sed -i -e "s/$version/GTR40/g" /etc/banner
+                sed -i -e "s/$version/GTR40/g" /etc/config/system
+                sed -i -e "s/3g-internet/wwan0/g" /etc/config/system
+                uci commit
+                /etc/init.d/simman restart
+            fi
+        ;;
+
+        $SIM7600)
+            if  [ "$version" = "GTRx0" -o "$version" = "GTR30" ] && [ "$DEVPATH" = "/devices/soc0/80080000.ahb/80090000.usb/ci_hdrc.1/usb1/1-1/1-1:1.2" -o "$DEVPATH" = "/devices/soc0/80080000.ahb/80090000.usb/ci_hdrc.1/usb1/1-1/1-1.1/1-1.1:1.2"  ]; then
                 sed -i -e "s/devices = SIM5360/devices = mobile/g" /etc/smsd.conf
                 /etc/init.d/simman stop
                 uci delete network.internet

@@ -80,6 +80,10 @@ o.optional    = true
 o.placeholder = 514
 o.datatype    = "port"
 
+o = s:taboption("logging", Value, "log_file", translate("Write system log to file"))
+o.optional    = true
+o.placeholder = "/mnt/data/system.log"
+
 o = s:taboption("logging", ListValue, "conloglevel", translate("Log output level"))
 o:value(8, translate("Debug"))
 o:value(7, translate("Info"))

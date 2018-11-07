@@ -45,6 +45,11 @@ mwan_policy = m5:section(NamedSection, arg[1], "policy", "")
 use_member = mwan_policy:option(DynamicList, "use_member", translate("Member used"))
 	cbiAddMember(use_member)
 
+comeback = mwan_policy:option(ListValue, "comeback", translate("Return to member"), translate("Return to this member is performed with the current connection break. Use this option in one policy with the current participant designation."))
+	comeback.default = "none"
+	comeback:value("none")
+	cbiAddMember(comeback)
+
 last_resort = mwan_policy:option(ListValue, "last_resort", translate("Last resort"),
 	translate("When all policy members are offline use this behavior for matched traffic"))
 	last_resort.default = "unreachable"

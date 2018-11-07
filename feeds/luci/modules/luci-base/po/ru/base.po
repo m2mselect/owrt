@@ -4597,3 +4597,12 @@ msgstr "I/O порт"
 
 msgid "Mode 1 - voltage measurement; Mode 2 - resistive sensor connection; Mode 3 - load management"
 msgstr "Mode 1 - измерение напряжения; Mode 2 - подключение резистивных датчиков; Mode 3 - управление нагрузкой"
+
+msgid "Return to member"
+msgstr "Возврат на участника"
+
+msgid "Return to this member is performed with the current connection break. Use this option in one policy with the current participant designation."
+msgstr "Возврат на данного участника осуществляется с разрывом текущих соединений. Используйте эту опцию только в одной политике с указанием действующего участника."
+
+msgid "Write system log to file"
+msgstr "Записывать системные события в файл"
