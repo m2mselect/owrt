@@ -1039,8 +1039,8 @@
 						    "status-address";
 					compatible = "fsl,imx28-vddd";
 					regulator-name = "vddd";
-					regulator-min-microvolt = <1450000>;
-					regulator-max-microvolt = <1450000>;
+					regulator-min-microvolt = <1400000>;
+					regulator-max-microvolt = <1500000>;
 					vddd-supply = <&reg_vdda>;
 				};
 
