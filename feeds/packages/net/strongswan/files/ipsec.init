@@ -181,18 +181,24 @@ config_conn() {
 	config_get auth_method        "$1" authentication_method "psk"
 	config_get my_identifier_type "$1" my_identifier_type ""
 	config_get local_identifier   "$1" my_identifier ""
+	config_get remote_identifier_type  "$1" remote_identifier_type ""
 	config_get remote_identifier  "$1" remote_identifier ""
 
 	[ "$gateway" = "any" ] && remote_gateway="%any" || remote_gateway="$gateway"
 
 	if [ "$my_identifier_type" == "fqdn" ]; then
 		local_identifier="@$local_identifier"
-		remote_identifier="@$remote_identifier"
 	elif [ "$my_identifier_type" == "user_fqdn" ]; then
 		local_identifier="@@$local_identifier"
-		remote_identifier="@@$remote_identifier"
 	elif [ "$my_identifier_type" == "address" ]; then
 		local_identifier="$local_identifier"
+	fi
+
+	if [ "$remote_identifier_type" == "fqdn" ]; then
+		remote_identifier="@$remote_identifier"
+	elif [ "$remote_identifier_type" == "user_fqdn" ]; then
+		remote_identifier="@@$remote_identifier"
+	elif [ "$remote_identifier_type" == "address" ]; then
 		remote_identifier="$remote_identifier"
 	fi
 

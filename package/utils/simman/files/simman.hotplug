@@ -11,7 +11,11 @@ case "$ACTION" in
 
         case "$PRODUCT" in
         $SIM7100)
-        if  [ "$version" = "GTRx0" -o "$version" = "GTR30" ] && [ "$DEVPATH" = "/devices/soc0/80080000.ahb/80090000.usb/ci_hdrc.1/usb1/1-1/1-1:1.2" -o "$DEVPATH" = "/devices/soc0/80080000.ahb/80090000.usb/ci_hdrc.1/usb1/1-1/1-1.1/1-1.1:1.2"  ]; then
+            if  [ "$version" = "GTRx0" -o "$version" = "GTR30" ] \
+                && [ "$DEVPATH" = "/devices/soc0/80080000.ahb/80090000.usb/ci_hdrc.1/usb1/1-1/1-1:1.2" \
+                -o "$DEVPATH" = "/devices/soc0/80080000.ahb/80090000.usb/ci_hdrc.1/usb1/1-1/1-1.1/1-1.1:1.2" \
+                -o "$DEVPATH" = "/devices/soc0/80080000.ahb/80090000.usb/ci_hdrc.1/usb1/1-1/1-1.3/1-1.3:1.2" ]; then
+
                 sed -i -e "s/devices = SIM5360/devices = mobile/g" /etc/smsd.conf
                 /etc/init.d/simman stop
                 uci delete network.internet
@@ -35,7 +39,11 @@ case "$ACTION" in
         ;;
 
         $SIM7600)
-            if  [ "$version" = "GTRx0" -o "$version" = "GTR30" ] && [ "$DEVPATH" = "/devices/soc0/80080000.ahb/80090000.usb/ci_hdrc.1/usb1/1-1/1-1:1.2" -o "$DEVPATH" = "/devices/soc0/80080000.ahb/80090000.usb/ci_hdrc.1/usb1/1-1/1-1.1/1-1.1:1.2"  ]; then
+            if  [ "$version" = "GTRx0" -o "$version" = "GTR30" ] \
+                && [ "$DEVPATH" = "/devices/soc0/80080000.ahb/80090000.usb/ci_hdrc.1/usb1/1-1/1-1:1.2" \
+                -o "$DEVPATH" = "/devices/soc0/80080000.ahb/80090000.usb/ci_hdrc.1/usb1/1-1/1-1.1/1-1.1:1.2" \
+                -o "$DEVPATH" = "/devices/soc0/80080000.ahb/80090000.usb/ci_hdrc.1/usb1/1-1/1-1.3/1-1.3:1.2" ]; then
+
                 sed -i -e "s/devices = SIM5360/devices = mobile/g" /etc/smsd.conf
                 /etc/init.d/simman stop
                 uci delete network.internet
@@ -60,7 +68,11 @@ case "$ACTION" in
 
         $EHS5)
             PROTO_3G=$(uci get simman.core.proto 2>/dev/null)
-            if [ "$version" = "GTRx0" -o "$version" = "GTR40" -o "$PROTO_3G" != "0" ] && [ "$DEVPATH" = "/devices/soc0/80080000.ahb/80090000.usb/ci_hdrc.1/usb1/1-1/1-1:1.2" -o "$DEVPATH" = "/devices/soc0/80080000.ahb/80090000.usb/ci_hdrc.1/usb1/1-1/1-1.1/1-1.1:1.2" ]; then
+            if [ "$version" = "GTRx0" -o "$version" = "GTR40" -o "$PROTO_3G" != "0" ] \
+                && [ "$DEVPATH" = "/devices/soc0/80080000.ahb/80090000.usb/ci_hdrc.1/usb1/1-1/1-1:1.2" \
+                -o "$DEVPATH" = "/devices/soc0/80080000.ahb/80090000.usb/ci_hdrc.1/usb1/1-1/1-1.1/1-1.1:1.2" \
+                -o "$DEVPATH" = "/devices/soc0/80080000.ahb/80090000.usb/ci_hdrc.1/usb1/1-1/1-1.3/1-1.3:1.2" ]; then
+
                 sed -i -e "s/devices = SIM5360/devices = mobile/g" /etc/smsd.conf
                 uci delete network.wwan0
                 uci set network.internet=interface
@@ -85,8 +97,11 @@ case "$ACTION" in
 
         $SIM5360)
             PROTO_3G=$(uci get simman.core.proto 2>/dev/null)
-            if  [ "$version" = "GTRx0" -o "$version" = "GTR40" -o "$PROTO_3G" != "2" ] && [ "$DEVPATH" = "/devices/soc0/80080000.ahb/80090000.usb/ci_hdrc.1/usb1/1-1/1-1:1.2" -o "$DEVPATH" = "/devices/soc0/80080000.ahb/80090000.usb/ci_hdrc.1/usb1/1-1/1-1.1/1-1.1:1.2"  ]; then
-            uci delete network.wwan0
+            if  [ "$version" = "GTRx0" -o "$version" = "GTR40" -o "$PROTO_3G" != "2" ] \
+                && [ "$DEVPATH" = "/devices/soc0/80080000.ahb/80090000.usb/ci_hdrc.1/usb1/1-1/1-1:1.2" \
+                -o "$DEVPATH" = "/devices/soc0/80080000.ahb/80090000.usb/ci_hdrc.1/usb1/1-1/1-1.1/1-1.1:1.2" \
+                -o "$DEVPATH" = "/devices/soc0/80080000.ahb/80090000.usb/ci_hdrc.1/usb1/1-1/1-1.3/1-1.3:1.2" ]; then
+                uci delete network.wwan0
                 sed -i -e "s/devices = mobile/devices = SIM5360/g" /etc/smsd.conf
                 /etc/init.d/simman stop
                 uci delete network.internet
@@ -111,7 +126,10 @@ case "$ACTION" in
         
         $SIM5300)
             PROTO_3G=$(uci get simman.core.proto 2>/dev/null)
-            if [ "$version" = "GTRx0" -o "$version" = "GTR40" -o "$PROTO_3G" != "3" ] && [ "$DEVPATH" = "/devices/soc0/80080000.ahb/80090000.usb/ci_hdrc.1/usb1/1-1/1-1:1.2" -o "$DEVPATH" = "/devices/soc0/80080000.ahb/80090000.usb/ci_hdrc.1/usb1/1-1/1-1.1/1-1.1:1.2" ]; then
+            if [ "$version" = "GTRx0" -o "$version" = "GTR40" -o "$PROTO_3G" != "3" ] \
+                && [ "$DEVPATH" = "/devices/soc0/80080000.ahb/80090000.usb/ci_hdrc.1/usb1/1-1/1-1:1.6" \
+                -o "$DEVPATH" = "/devices/soc0/80080000.ahb/80090000.usb/ci_hdrc.1/usb1/1-1/1-1.1/1-1.1:1.6" \
+                -o "$DEVPATH" = "/devices/soc0/80080000.ahb/80090000.usb/ci_hdrc.1/usb1/1-1/1-1./1-1.3:1.6" \]; then
                 sed -i -e "s/devices = SIM5360/devices = mobile/g" /etc/smsd.conf
                 uci delete network.wwan0
                 uci set network.internet=interface

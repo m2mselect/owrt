@@ -1,9 +1,10 @@
 #!/bin/sh /etc/rc.common
 
 START=90
-COMMANDS="/etc/smscontrol/commands"
-CALLS="/etc/smscontrol/calls"
-CLI="/etc/smscontrol/cli"
+DIR="/var/spool/smscontrol"
+COMMANDS="/var/spool/smscontrol/commands"
+CALLS="/var/spool/smscontrol/calls"
+CLI="/var/spool/smscontrol/cli"
 OUT_DIR="/var/spool/sms/outgoing"
 
 add_comm() {
@@ -79,21 +80,34 @@ add_cli() {
 	fi
 }
 
-restart() {
-
+stop() {
 	rm "$COMMANDS"
-	touch "$COMMANDS"
-	chmod +x "$COMMANDS"
 	rm "$CALLS"
-	touch "$CALLS"
-	chmod +x "$CALLS"
 	rm "$CLI"
-	touch "$CLI"
-	chmod +x "$CLI"
-	config_load smscontrol
-	config_foreach add_call call
-	config_foreach add_cli cli
-	echo "case \"\$1\" in" >> "$COMMANDS"
-	config_foreach add_comm remote
-	echo "esac" >> "$COMMANDS"
+	/etc/init.d/smstools3 stop
+}
+
+start() {
+	enabled=$(uci get smscontrol.common.enabled)
+	if [ "$enabled" -eq "1" ]; then
+		mkdir "$DIR"
+		touch "$COMMANDS"
+		chmod +x "$COMMANDS"
+		touch "$CALLS"
+		chmod +x "$CALLS"
+		touch "$CLI"
+		chmod +x "$CLI"
+		config_load smscontrol
+		config_foreach add_call call
+		config_foreach add_cli cli
+		echo "case \"\$1\" in" >> "$COMMANDS"
+		config_foreach add_comm remote
+		echo "esac" >> "$COMMANDS"
+		/etc/init.d/smstools3 start
+	fi
+}
+
+restart() {
+	stop
+	start
 }

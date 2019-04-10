@@ -119,7 +119,7 @@ sendsms = k:option(Button, "sendsms", translate("Send") )
         luci.sys.call("/etc/smscontrol/sendsms %s '%s' &" %{to, msgtxt})
         self.map:set(section, "to", "")
         self.map:set(section, "msgtxt", "")
-        return self.map:set(section, "err", "Message sent successfully")
+        return self.map:set(section, "err", "")
       end
     end
   end

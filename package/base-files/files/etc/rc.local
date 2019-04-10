@@ -3,4 +3,6 @@ ln -s /dev/ttyAPP2 /dev/com1
 
 /etc/initscripts/ethinit &
 
+/etc/initscripts/beeper &
+
 exit 0

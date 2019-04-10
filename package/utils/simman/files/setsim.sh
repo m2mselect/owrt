@@ -187,7 +187,7 @@ else
  uci -q set network.$iface.password=$pass
 fi
 
-/etc/init.d/smstools3 stop > /dev/null &
+/etc/init.d/smstools3 stop &> /dev/null &
 
 sleep 1
 
@@ -206,6 +206,11 @@ if [ "$proto" == "2" -a "$pow" -ne "1" ]; then
   		sleep 1
   		echo "1" > $GPIO_PATH/gpio$PWRKEY_PIN/value
   		sleep 3
+  		dev=$(ls $ATDEVICE 2>/dev/null)
+  		while [ ! -z "$dev" ]; do
+  			sleep 4
+  			dev=$(ls $ATDEVICE 2>/dev/null)
+  		done
   	fi
 fi
 
@@ -224,8 +229,6 @@ if [ "$mode" == "0" ]; then
   		/etc/init.d/gpsd stop
   		/etc/init.d/ntpd stop
   fi
-
-  kill $(pidof cmux)
 
   # release SIMADDR
   echo "0" > $GPIO_PATH/gpio$SIMADDR_PIN/value  
@@ -308,7 +311,7 @@ if [ "$proto" == "2" -a "$pow" -ne "1" ]; then
   	logger -t $tag "SIM5360 powered up"
 fi
 
-sleep 10 && /etc/init.d/smstools3 restart > /dev/null &
+sleep 10 && /etc/init.d/smstools3 restart &> /dev/null &
 
 # store uci changes
 uci commit 

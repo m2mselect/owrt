@@ -8,13 +8,13 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=glib2
-PKG_VERSION:=2.43.4
+PKG_VERSION:=2.44.1
 PKG_RELEASE:=1
 
 PKG_SOURCE:=glib-$(PKG_VERSION).tar.xz
 PKG_BUILD_DIR:=$(BUILD_DIR)/glib-$(PKG_VERSION)
-PKG_SOURCE_URL:=@GNOME/glib/2.43
-PKG_MD5SUM:=2f28879252c660a65aa3139ec499776b
+PKG_SOURCE_URL:=@GNOME/glib/2.44
+PKG_MD5SUM:=83efba4722a9674b97437d1d99af79db
 
 PKG_BUILD_PARALLEL:=1
 HOST_BUILD_PARALLEL:=1
@@ -45,7 +45,8 @@ define Package/glib2/description
 endef
 
 HOST_CONFIGURE_ARGS += \
-	--disable-selinux
+	--disable-selinux \
+	--with-libiconv=gnu 
 
 CONFIGURE_ARGS += \
 	--enable-shared \

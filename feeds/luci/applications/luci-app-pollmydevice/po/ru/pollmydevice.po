@@ -1,5 +1,3 @@
-# Vladimir Ovseychuk <ovseychuk@teleofis.com>, 2016.
-
 msgid "PollMyDevice"
 msgstr "Опрос портов по TCP"
 
@@ -65,3 +63,6 @@ msgstr "Включить"
 
 msgid "Disable log messages"
 msgstr "Отключить логирование"
+
+msgid "New configuration (range [0-6]):"
+msgstr "Новая конфигурация (диапазон [0-6]): "

@@ -1,0 +1,7 @@
+#!/bin/sh
+
+if [ "$ACTION" == "add" -a "$PRODUCT" == "1519/20/1276" ]; then
+    /etc/simman/setsim.sh -p  
+fi
+
+exit 0

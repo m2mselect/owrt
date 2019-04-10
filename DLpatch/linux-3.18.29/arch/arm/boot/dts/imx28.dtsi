@@ -38,12 +38,24 @@
 	};
 
 	cpus {
-		#address-cells = <0>;
+		#address-cells = <1>;
 		#size-cells = <0>;
 
-		cpu {
+		cpu@0 {
 			compatible = "arm,arm926ej-s";
 			device_type = "cpu";
+			reg = <0x0>;
+			operating-points = <
+				/* kHz	uV */
+				64000   1200000
+				261819  1300000
+				360000  1300000
+				392728  1400000
+				454737  1500000 
+			>;
+			clocks = <&clks 4>;
+			clock-latency = <61036>; /* two CLK32 periods */
+			cpu0-supply = <&reg_vddd>;
 		};
 	};
 
@@ -641,6 +653,16 @@
 					fsl,pull-up = <MXS_PULL_DISABLE>;
 				};
 
+				pwm0_pins_b: pwm0@1 {
+					reg = <1>;
+					fsl,pinmux-ids = <
+						MX28_PAD_AUART1_RX__PWM_0
+					>;
+					fsl,drive-strength = <MXS_DRIVE_4mA>;
+					fsl,voltage = <MXS_VOLTAGE_HIGH>;
+					fsl,pull-up = <MXS_PULL_DISABLE>;
+				};
+
 				pwm2_pins_a: pwm2@0 {
 					reg = <0>;
 					fsl,pinmux-ids = <
@@ -1027,7 +1049,6 @@
 				#size-cells = <1>;
 				reg = <0x80044000 0x2000>;
 				interrupts = <6>;
-				switching-frequency = <24000000>;
 				ranges;
 
 				reg_vddd: regulator@80044040 {
@@ -1039,9 +1060,11 @@
 						    "status-address";
 					compatible = "fsl,imx28-vddd";
 					regulator-name = "vddd";
-					regulator-min-microvolt = <1400000>;
-					regulator-max-microvolt = <1500000>;
+					regulator-min-microvolt = <1050000>;
+					regulator-max-microvolt = <1550000>;
 					vddd-supply = <&reg_vdda>;
+					regulator-boot-on;
+					regulator-always-on;
 				};
 
 				reg_vdda: regulator@80044050 {
@@ -1056,6 +1079,8 @@
 					regulator-min-microvolt = <1725000>;
 					regulator-max-microvolt = <1950000>;
 					vdda-supply = <&reg_vddio>;
+					regulator-boot-on;
+					regulator-always-on;
 				};
 
 				reg_vddio: regulator@80044060 {
@@ -1068,8 +1093,10 @@
 					compatible = "fsl,imx28-vddio";
 					regulator-name = "vddio";
 					regulator-min-microvolt = <3000000>;
-					regulator-max-microvolt = <3575000>;
+					regulator-max-microvolt = <3550000>;
 					regulator-microvolt-offset = <80000>;
+					regulator-boot-on;
+					regulator-always-on;
 				};
 			};
 

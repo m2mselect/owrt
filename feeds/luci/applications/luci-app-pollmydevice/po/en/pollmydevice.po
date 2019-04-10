@@ -60,3 +60,6 @@ msgstr "Disable"
 
 msgid "Enable"
 msgstr "Enable"
+
+msgid "New configuration (range [0-6]):"
+msgstr "New configuration (range [0-6]):"

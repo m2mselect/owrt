@@ -13,12 +13,12 @@ single=$4
 
 if [ -n "$single" ]
 then
-	/bin/ping -c 1 -w 1 -q -I "$iface" "$address" > /dev/null 2>&1
+	/bin/ping -c 1 -w 1 -q "$address" > /dev/null 2>&1
 	exit 0
 fi
 
 while [ 1 ]
 do
 	/bin/sleep "$period"
-	/bin/ping -c 1 -w 1 -q -I "$iface" "$address" > /dev/null 2>&1
+	/bin/ping -c 1 -w 1 -q "$address" > /dev/null 2>&1
 done

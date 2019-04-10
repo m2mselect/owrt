@@ -140,6 +140,7 @@ end
 					<input class="cbi-button cbi-button-add" style="margin-left: 10px;" type="submit" value="<%:Add%>" name="cbi.cts.<%=self.config%>.<%=self.sectiontype%>.<%=section%>" title="<%:Add%>" />
 				<% else %>
 					<% if self.invalid_cts then -%><div class="cbi-section-error"><% end %>
+					<label class="cbi-value-title-2" style="padding-left:10px;"<%= attr("for", cbid) %>><span onmouseover="ShowHint(this, 'Name of the new configuration')" onmouseout="HideHint(this)"><%=translate("New configuration (range [0-6]):")%></span></label>
 					<input type="text" pattern="[0-6]{1}" class="cbi-section-create-name" id="cbi.cts.<%=self.config%>.<%=self.sectiontype%>.<%=section%>" name="cbi.cts.<%=self.config%>.<%=self.sectiontype%>.<%=section%>" />
 					<script type="text/javascript">cbi_validate_field('cbi.cts.<%=self.config%>.<%=self.sectiontype%>.<%=section%>', true, 'uciname');</script>
 					<input class="cbi-button cbi-button-add" type="submit" onclick="this.form.cbi_state='add-section'; return true" value="<%:Add%>" title="<%:Add%>" />

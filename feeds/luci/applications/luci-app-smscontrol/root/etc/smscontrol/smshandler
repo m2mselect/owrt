@@ -1,5 +1,5 @@
 #!/bin/ash
-DIR="/etc/smscontrol"
+DIR="/var/spool/smscontrol"
 ENABLED=$(uci get smscontrol.common.enabled)
 if [ "$ENABLED" -eq "1" ]; then
     case "$1" in

@@ -309,8 +309,8 @@ static int mxs_set_voltage_sel(struct regulator_dev *reg, unsigned sel)
 
 	uV = regulator_list_voltage_linear(reg, sel);
 
-	if (uV >= 0)
-		pr_debug("%s: %s: %d mV\n", __func__, desc->name, uV / 1000);
+	// if (uV >= 0)
+	// 	pr_debug("%s: %s: %d mV\n", __func__, desc->name, uV / 1000);
 
 	regs = (readl(sreg->base_addr) & ~desc->vsel_mask);
 	writel(sel | regs, sreg->base_addr);
@@ -494,7 +494,7 @@ static int mxs_regulator_probe(struct platform_device *pdev)
 	if (!sreg)
 		return -ENOMEM;
 
-	initdata = of_get_regulator_init_data(dev, dev->of_node);
+	initdata = of_get_regulator_init_data(dev, dev->of_node, &sreg->desc);
 	if (!initdata) {
 		dev_err(dev, "missing regulator init data\n");
 		return -EINVAL;
@@ -556,23 +556,20 @@ static int mxs_regulator_probe(struct platform_device *pdev)
 
 	platform_set_drvdata(pdev, rdev);
 
-	dev_info(dev, "initialized\n");
-
 	return 0;
 }
 
 static struct platform_driver mxs_regulator_driver = {
-	.probe	= mxs_regulator_probe,
 	.driver = {
-		.name	= "mxs-regulator",
-		.owner	= THIS_MODULE,
+		.name	= "mxs_regulator",
 		.of_match_table = of_mxs_regulator_match,
 	},
+	.probe	= mxs_regulator_probe,
 };
 
 module_platform_driver(mxs_regulator_driver);
 
 MODULE_AUTHOR("Stefan Wahren <stefan.wahren@i2se.com>");
-MODULE_DESCRIPTION("MXS voltage regulators");
+MODULE_DESCRIPTION("Freescale STMP378X voltage regulators");
 MODULE_LICENSE("GPL v2");
 MODULE_ALIAS("platform:mxs_regulator");

@@ -16,6 +16,8 @@ local m = Map("pollmydevice", translate("PollMyDevice"), translate("TCP to RS232
 local s = m:section(NamedSection, arg[1], "pollmydevice", translate("Utility Settings"))
 	s.addremove = false
 
+desc = s:option(Value, "desc", translate("Description"))
+
 devicename = s:option(Value, "devicename", translate("Port"))
 	devicename.default = "/dev/com0"
 	devicename:value("/dev/com0")
@@ -138,9 +140,9 @@ client_auth = s:option(ListValue, "client_auth", translate("Client Authentificat
   --client_auth.rmempty = false
   client_auth:depends("mode","client")
 
-teleofisid = s:option(DummyValue, "adtid",  translate("Device ID"))
+adtid = s:option(DummyValue, "adtid",  translate("Device ID"))
   --client_auth.rmempty = false
-  teleofisid:depends("mode","client")
+  adtid:depends("mode","client")
 
 coff = s:option(Button, "coff", translate("Disable console port"), translate("Save the changes. The router will reboot"))  
   coff.title      = translate("Disable console port")

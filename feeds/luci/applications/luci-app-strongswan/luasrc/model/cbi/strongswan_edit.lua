@@ -82,10 +82,17 @@ o = s:option( Value, "my_identifier", translate("My identifier"), translate("Set
 		return value
 	end
 
+local r_iden  = s:option( ListValue, "remote_identifier_type", translate("Remote identifier type"), translate("Choose one accordingly to your IPSec configuration"))
+	r_iden.nowrite = true
+	r_iden.default = "fqdn"
+	r_iden:value("fqdn", translate("FQDN"))
+	r_iden:value("user_fqdn", translate("User FQDN"))
+	r_iden:value("address", translate("Address"))
+
 o = s:option( Value, "remote_identifier", translate("Remote identifier"), translate("Set the remote identifier for IPSec tunnel"))
 
 	function o.validate(self, value, section)
-		if iden:formvalue(section) == "address" then
+		if r_iden:formvalue(section) == "address" then
 			if not value:match("[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+") then
 				m.message = translate("IP address expected in \"Remote identifier\" field")
 				return nil

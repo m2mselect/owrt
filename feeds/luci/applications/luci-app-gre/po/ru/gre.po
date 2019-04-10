@@ -1,0 +1,65 @@
+msgid "Tunnel name"
+msgstr "Имя туннеля"
+
+msgid "WAN interface name"
+msgstr "Имя WAN интерфейса"
+
+msgid "Local tunnel IP"
+msgstr "Локальный IP туннеля"
+
+msgid "Tunnel mode"
+msgstr "Режим туннеля"
+
+msgid "New configuration name:"
+msgstr "Новое имя конфигурации"
+
+msgid "Add New"
+msgstr "Добавить"
+
+msgid "Enable GRE (Generic Routing Encapsulation) tunnel."
+msgstr "Включить GRE (Generic Routing Encapsulation) туннель"
+
+msgid "Remote endpoint IP address"
+msgstr "IP-адрес удаленной конечной точки"
+
+msgid "IP address of the remote GRE tunnel device."
+msgstr "IP-адрес удаленного устройства GRE туннеля"
+
+msgid "Remote network"
+msgstr "Удаленная сеть"
+
+msgid "Remote network netmask"
+msgstr "Удаленная маска сети"
+
+msgid "Netmask of LAN network on the remote device. Range [0 - 32]."
+msgstr "Маска LAN сети на удаленном устройстве. Диапазон [0 - 32]"
+
+msgid "Local virtual IP address. Can not be in the same subnet as LAN network."
+msgstr "Локальный виртуальный IP адрес. Не может находиться в той же подсети, что и LAN"
+
+msgid "Local tunnel netmask"
+msgstr "Локальная маска сети туннеля"
+
+msgid "Netmask of local virtual IP address. Range [0 - 32]."
+msgstr "Маска локальной виртуальной сети. Диапазон [0 - 32]"
+
+msgid "MTU"
+msgstr "MTU"
+
+msgid "MTU (Maximum Transmission Unit) for tunnel connection. Range [0 - 1500]."
+msgstr "MTU (Maximum Transmission Unit) для туннельного соединения. Диапазон [0 - 1500]"
+
+msgid "TTL"
+msgstr "TTL"
+
+msgid "TTL (Time To Live) for tunnel connection. Range [0 - 255]."
+msgstr "TTL (Time To Live) для туннельного соединения. Диапазон  [0 - 255]."
+
+msgid "Enable PMTUD (Path Maximum Transmission Unit Discovery) technique for this tunnel."
+msgstr "Включить PMTUD (Path Maximum Transmission Unit Discovery) технологию для этого туннеля"
+
+msgid "PMTUD"
+msgstr "PMTUD"
+
+msgid "IP address of LAN network on the remote device."
+msgstr "IP адрес LAN сети на удаленном устройстве"

@@ -18,3 +18,7 @@ echo 0 > /sys/class/gpio/gpio82/value
 echo 78 > /sys/class/gpio/export
 echo out > /sys/class/gpio/gpio78/direction
 echo 1 > /sys/class/gpio/gpio78/value
+
+# power up second modem
+echo 133 > /sys/class/gpio/export
+echo high > /sys/class/gpio/gpio133/direction

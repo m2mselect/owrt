@@ -28,6 +28,11 @@ shift $((OPTIND-1))
 # Check if device exists
 [ ! -e $device ] && exit 0
 
+PROTO_3G=$(uci get simman.core.proto 2>/dev/null)
+if [ "$PROTO_3G" = "3" ];then
+	echo "ALL:" > /tmp/lock/smsd.lock
+fi
+
 REG=$(gcom -d $device -s $SCRIPT_REG | awk -F',' '{print $2}')
 [ -z "$REG" ] && REG="NONE"
 
@@ -53,3 +58,6 @@ else
 	fi
 fi
 
+if [ "$PROTO_3G" = "3" ];then
+	rm /tmp/lock/smsd.lock
+fi

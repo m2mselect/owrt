@@ -1,0 +1,65 @@
+msgid "Tunnel name"
+msgstr "Tunnel name"
+
+msgid "WAN interface name"
+msgstr "WAN interface name"
+
+msgid "Local tunnel IP"
+msgstr "Local tunnel IP"
+
+msgid "Tunnel mode"
+msgstr "Tunnel mode"
+
+msgid "New configuration name:"
+msgstr "New configuration name:"
+
+msgid "Add New"
+msgstr "Add New"
+
+msgid "Enable GRE (Generic Routing Encapsulation) tunnel."
+msgstr "Enable GRE (Generic Routing Encapsulation) tunnel."
+
+msgid "Remote endpoint IP address"
+msgstr "Remote endpoint IP address"
+
+msgid "IP address of the remote GRE tunnel device."
+msgstr "IP address of the remote GRE tunnel device."
+
+msgid "Remote network"
+msgstr "Remote network"
+
+msgid "Remote network netmask"
+msgstr "Remote network netmask"
+
+msgid "Netmask of LAN network on the remote device. Range [0 - 32]."
+msgstr "Netmask of LAN network on the remote device. Range [0 - 32]."
+
+msgid "Local virtual IP address. Can not be in the same subnet as LAN network."
+msgstr "Local virtual IP address. Can not be in the same subnet as LAN network."
+
+msgid "Local tunnel netmask"
+msgstr "Local tunnel netmask"
+
+msgid "Netmask of local virtual IP address. Range [0 - 32]."
+msgstr "Netmask of local virtual IP address. Range [0 - 32]."
+
+msgid "MTU"
+msgstr "MTU"
+
+msgid "MTU (Maximum Transmission Unit) for tunnel connection. Range [0 - 1500]."
+msgstr "MTU (Maximum Transmission Unit) for tunnel connection. Range [0 - 1500]."
+
+msgid "TTL"
+msgstr "TTL"
+
+msgid "TTL (Time To Live) for tunnel connection. Range [0 - 255]."
+msgstr "TTL (Time To Live) for tunnel connection. Range [0 - 255]."
+
+msgid "Enable PMTUD (Path Maximum Transmission Unit Discovery) technique for this tunnel."
+msgstr "Enable PMTUD (Path Maximum Transmission Unit Discovery) technique for this tunnel."
+
+msgid "PMTUD"
+msgstr "PMTUD"
+
+msgid "IP address of LAN network on the remote device."
+msgstr "IP address of LAN network on the remote device."

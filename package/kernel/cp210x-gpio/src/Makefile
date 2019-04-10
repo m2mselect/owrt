@@ -1,0 +1,1 @@
+obj-${CONFIG_USB_SERIAL_CP210X_GPIO}	+= cp210x-gpio.o

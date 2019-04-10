@@ -13,6 +13,11 @@ local s = m:section(TypedSection, "interface", translate("TCP to RS232/RS485 con
 	s.defaults = {mode = "disabled"}
 	s.sectionhead = "№"
 
+o = s:option(DummyValue, "desc", translate("Description"))
+	function o.cfgvalue(self, section)
+		return self.map:get(section, self.option) or "-"
+	end
+
 o = s:option(DummyValue, "mode", translate("Mode"))
 	function o.cfgvalue(self, section)
 		return self.map:get(section, self.option) or "-"

@@ -34,6 +34,11 @@ proto=$(uci -q get simman.core.proto)
 # Check if device exists
 [ ! -e $device ] && exit 0
 
+PROTO_3G=$(uci get simman.core.proto 2>/dev/null)
+if [ "$PROTO_3G" = "3" ];then
+	echo "ALL:" > /tmp/lock/smsd.lock
+fi
+
 if [ "$proto" = "0" ]; then
 	CCID=$(gcom -d $device -s $SCRIPT_CCID)
 elif [ "$proto" = "3" ]; then
@@ -48,3 +53,6 @@ fi
 
 echo $CCID
 
+if [ "$PROTO_3G" = "3" ];then
+	rm /tmp/lock/smsd.lock
+fi
