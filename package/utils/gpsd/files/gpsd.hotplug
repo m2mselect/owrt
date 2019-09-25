@@ -1,7 +1,7 @@
 case "$ACTION" in
     add)
         GPS=$(echo $DEVPATH | grep "1:1.1")
-        if [ "$PRODUCT" = "1e0e/9001/232" ] && [ ! -z "$GPS" ]; then
+        if [ "$PRODUCT" = "1e0e/9001/232" -o "$PRODUCT" = "1e0e/9001/318" ] && [ ! -z "$GPS" ]; then
             GPSPORT=$(uci get simman.core.gpsdevice)
             DEVICE_NAME="/dev/$(ls /sys/$DEVPATH | grep tty)"
             if [ "$GPSPORT" != "/dev/ttyAPP1" ]; then
@@ -17,7 +17,7 @@ case "$ACTION" in
         ;;
     remove)
         GPS=$(echo $DEVPATH | grep "1:1.1")
-        if [ "$PRODUCT" = "1e0e/9001/232" ] && [ ! -z "$GPS" ]; then
+        if [ "$PRODUCT" = "1e0e/9001/232" -o "$PRODUCT" = "1e0e/9001/318" ] && [ ! -z "$GPS" ]; then
             GPSPORT=$(uci get simman.core.gpsdevice)
             DEVICE_NAME="/dev/$(ls /sys/$DEVPATH | grep tty)"
             if [ "$GPSPORT" != "/dev/ttyAPP1" ]; then

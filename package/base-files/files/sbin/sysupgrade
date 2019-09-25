@@ -63,7 +63,7 @@ try_upgrade ()
 		    		if_failed
 		    	fi
 		    	NEW_VERSION=$(tar -xf sysupgrade_gtr.tar openwrt_release -O | grep 'Build' | awk -F 'Build ' '{print $2}' | awk -F '.' '{print $1}')
-		    	if [ "$NEW_VERSION" -ne "$VER_FIRST" ] && [ -f openwrt_release ]; then
+		    	if [ "$NEW_VERSION" != "$VER_FIRST" ] && [ $(tar -tf sysupgrade_gtr.tar openwrt_release) ]; then
 		    		echo "Firmware not supported by hardware"
 		    		if_failed
 		    	fi

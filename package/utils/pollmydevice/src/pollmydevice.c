@@ -88,6 +88,8 @@ typedef struct
     long long int adtID;
     int modbus_gateway;
     int quiet;
+    int timeout_pack;
+    int size_pack;
 } device_config_t;
 
 
@@ -431,8 +433,16 @@ void *ServerThreadFunc(void *args)
     else if(deviceConfig.byteSize == 5) serialPortConfig.c_cflag |= CS5;
     else serialPortConfig.c_cflag |= CS8;
 
-    serialPortConfig.c_cc[VMIN]     = 0;                // blocking read until 1 character arrives (0 - no, 1 - yes)
-    serialPortConfig.c_cc[VTIME]    = 0;                // inter-character timer
+    //serialPortConfig.c_cc[VMIN]     = 0;                // blocking read until 1 character arrives (0 - no, 1 - yes)
+    //serialPortConfig.c_cc[VTIME]    = 0;                // inter-character timer
+
+    unsigned char val = (uint8_t)((deviceConfig.timeout_pack/100)%256);
+    serialPortConfig.c_line &= ~ICANON;					//DISABLE CANONCIAL
+    serialPortConfig.c_cc[VTIME]    = val;            	// inter-character timer
+    LOG("Set VTIME=%d\n", val);
+    val = (uint8_t)(deviceConfig.size_pack%256);
+    serialPortConfig.c_cc[VMIN]     = val;              // blocking read until 1 character arrives (0 - no, 1 - yes)
+    LOG("Set VMIN=%d\n", val);
 
     // write config
     tcflush(threadFD->serialPort, TCIFLUSH);                      // clean the line
@@ -575,6 +585,7 @@ void *ServerThreadFunc(void *args)
             else if(eventSource == threadFD->TCPtimer) 
             {
                 blockOther = 0; // free access for all clients
+                LOG("Connection hold time is up. Free access for all clients\n");
             }
 
             // data from TCP on existing connection
@@ -617,6 +628,7 @@ void *ServerThreadFunc(void *args)
                     else
                         if (!deviceConfig.quiet)
                             LOG("Data refused\n");  
+                        //lastActiveConnSocket = -1;
                 }
                 else // if someone want to close connection
                 {
@@ -638,6 +650,7 @@ void *ServerThreadFunc(void *args)
             {
                 if (!deviceConfig.quiet)
                     LOG("Unknown epoll event\n");
+                //lastActiveConnSocket = -1;
             }
         }      
     }
@@ -755,8 +768,14 @@ void *ClientThreadFunc(void *args)
     else if(deviceConfig.byteSize == 5) serialPortConfig.c_cflag |= CS5;
     else serialPortConfig.c_cflag |= CS8;
 
-    serialPortConfig.c_cc[VMIN]     = 0;                // blocking read until 1 character arrives (0 - no, 1 - yes)
-    serialPortConfig.c_cc[VTIME]    = 0;                // inter-character timer
+//    serialPortConfig.c_cc[VMIN]     = 0;                // blocking read until 1 character arrives (0 - no, 1 - yes)
+//    serialPortConfig.c_cc[VTIME]    = 0;                // inter-character timer
+
+    unsigned char val = (uint8_t)((deviceConfig.timeout_pack/100)%256);
+    serialPortConfig.c_line &= ~ICANON;					//DISABLE CANONCIAL
+    serialPortConfig.c_cc[VTIME]    = val;            	// inter-character timer
+    val = (uint8_t)(deviceConfig.size_pack%256);
+    serialPortConfig.c_cc[VMIN]     = val;              // blocking read until 1 character arrives (0 - no, 1 - yes)
 
     // write config
     tcflush(threadFD->serialPort, TCIFLUSH);                      // clean the line
@@ -1553,6 +1572,8 @@ device_config_t GetFullDeviceConfig(int deviceID)
     char UCIpathClientTimeout[MAX_CHARS_IN_UCIPATH] = ".client_timeout";
     char UCIpathModbusGateway[MAX_CHARS_IN_UCIPATH] = ".modbus_gateway";
     char UCIpathQuiet[MAX_CHARS_IN_UCIPATH]         = ".quiet";
+    char UCIpathPackTimeout[MAX_CHARS_IN_UCIPATH]   = ".pack_timeout";
+    char UCIpathPackSize[MAX_CHARS_IN_UCIPATH]      = ".pack_size";
     // -------------------------------------------- max = 15 symbols, use TMP_PATH_LENGTH
 
     char UCIpathNumber[MAX_DIGITS_IN_DEV_NUM];
@@ -1695,7 +1716,10 @@ device_config_t GetFullDeviceConfig(int deviceID)
     }
     if(UCIptr.flags & UCI_LOOKUP_COMPLETE)
         deviceConfig.holdConnTime = atoi(UCIptr.o->v.string);
-
+    if(deviceConfig.holdConnTime==0){
+        LOG("Connection hold time not set. Set value to 60 sec\n");
+        deviceConfig.holdConnTime = 60;
+    }
     // client_host
     memcpy(UCIpath , UCIpathBegin, MAX_CHARS_IN_UCIPATH);
     strncat(UCIpath, UCIpathNumber, MAX_DIGITS_IN_DEV_NUM-2);
@@ -1767,6 +1791,30 @@ device_config_t GetFullDeviceConfig(int deviceID)
     }
     if(UCIptr.flags & UCI_LOOKUP_COMPLETE)
         deviceConfig.quiet = atoi(UCIptr.o->v.string);
+
+    // pack_timeout
+    memcpy(UCIpath , UCIpathBegin, MAX_CHARS_IN_UCIPATH);
+    strncat(UCIpath, UCIpathNumber, MAX_DIGITS_IN_DEV_NUM-2);
+    strncat(UCIpath, UCIpathPackTimeout, TMP_PATH_LENGTH);
+    if ((uci_lookup_ptr(UCIcontext, &UCIptr, UCIpath, true) != UCI_OK)||
+    		(UCIptr.o==NULL || UCIptr.o->v.string==NULL))
+    {
+    	LOG("No UCI field %s \n", UCIpathPackTimeout);
+    }
+    if(UCIptr.flags & UCI_LOOKUP_COMPLETE)
+    	deviceConfig.timeout_pack = atoi(UCIptr.o->v.string);
+
+    // pack_timeout
+    memcpy(UCIpath , UCIpathBegin, MAX_CHARS_IN_UCIPATH);
+    strncat(UCIpath, UCIpathNumber, MAX_DIGITS_IN_DEV_NUM-2);
+    strncat(UCIpath, UCIpathPackSize, TMP_PATH_LENGTH);
+    if ((uci_lookup_ptr(UCIcontext, &UCIptr, UCIpath, true) != UCI_OK)||
+    		(UCIptr.o==NULL || UCIptr.o->v.string==NULL))
+    {
+    	LOG("No UCI field %s \n", UCIpathPackSize);
+    }
+    if(UCIptr.flags & UCI_LOOKUP_COMPLETE)
+    	deviceConfig.size_pack = atoi(UCIptr.o->v.string);
 
     // READ S/N AND CONVERT IT TO INT64
     FILE * pFuseFile;

@@ -1,0 +1,20 @@
+#!/bin/sh
+
+case "$1" in
+	list)
+		echo '{ "info": { } }'
+	;;
+	call)
+		case "$2" in
+			info)
+				volt=$((($(cat /sys/bus/iio/devices/iio:device0/in_voltage2_raw)+$(cat /sys/bus/iio/devices/iio:device0/in_voltage2_raw)+$(cat /sys/bus/iio/devices/iio:device0/in_voltage2_raw))*227/30))
+				temp=$((($(cat /sys/bus/iio/devices/iio:device0/in_temp8_raw)+$(cat /sys/bus/iio/devices/iio:device0/in_temp8_raw)+$(cat /sys/bus/iio/devices/iio:device0/in_temp8_raw)-3225)*253/3000))
+				temp="$temp °C"
+				echo '{'
+				echo "\"voltage\": \"$volt\" ,"
+				echo "\"temperature\": \"$temp\""
+				echo '}'
+			;;
+		esac
+	;;
+esac

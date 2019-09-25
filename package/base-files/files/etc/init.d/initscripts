@@ -1,16 +1,14 @@
 #!/bin/sh /etc/rc.common
 
 START=12
-USE_PROCD=1
+STOP=84
 
-start_service()
+start()
 {
-	procd_open_instance	
-	/etc/initscripts/iolines &
+	/etc/initscripts/symlinks &
 	/etc/initscripts/modeminit &
 	/etc/initscripts/usbhost &
-	/etc/initscripts/rtcinit &
 	/etc/initscripts/gpsinit &
-	/etc/initscripts/upgrade &
-	procd_close_instance
+	/etc/initscripts/upgrade &	
+	/etc/initscripts/rtcinit
 }

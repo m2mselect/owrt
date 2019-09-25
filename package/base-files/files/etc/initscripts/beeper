@@ -1,6 +1,5 @@
 #!/bin/sh
 
-echo 61 > /sys/class/gpio/export
 echo high > /sys/class/gpio/gpio61/direction
 sleep 0.3
 echo low > /sys/class/gpio/gpio61/direction

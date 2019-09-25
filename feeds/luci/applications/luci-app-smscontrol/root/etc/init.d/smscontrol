@@ -65,7 +65,7 @@ add_cli() {
 
 	config_get ack "$1" "ack"
 	if [ "$ack" = "1" ]; then
-		echo "		REPLY=\$(\$1)" >> "$CLI"
+		echo "		REPLY=\$(eval \$1)" >> "$CLI"
 		echo "		if [ -n \"\$REPLY\" ]; then"  >> "$CLI"
 		echo "			DATE=\$(date +%s)" >> "$CLI"
 		echo "			touch /tmp/sms\$DATE.sms" >> "$CLI"
@@ -76,7 +76,7 @@ add_cli() {
 		echo "			rm /tmp/sms\$DATE.sms" >> "$CLI"
 		echo "		fi" >> "$CLI"
 	else
-		echo "		\$1" >> "$CLI"
+		echo "		eval \$1" >> "$CLI"
 	fi
 }
 

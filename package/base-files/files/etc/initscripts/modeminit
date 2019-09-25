@@ -1,23 +1,33 @@
-echo 105 > /sys/class/gpio/export
-echo out > /sys/class/gpio/gpio105/direction
-echo 1 > /sys/class/gpio/gpio105/value
+#!/bin/sh
+sleep 7
+echo 61 > /sys/class/gpio/export
+echo in > /sys/class/gpio/gpio61/direction
+FLAG=$(cat /sys/class/gpio/gpio61/value)
 
-echo 83 > /sys/class/gpio/export
-echo out > /sys/class/gpio/gpio83/direction
-echo 0 > /sys/class/gpio/gpio83/value
+BOARD=$((($(cat /dev/board)+$(cat /dev/board)+$(cat /dev/board))/3))
+BOARD=$((($(cat /dev/board)+$(cat /dev/board)+$(cat /dev/board))/3))
+if [[ "$FLAG" -eq "0" -a "$BOARD" -gt "1775" -a "$BOARD" -lt "1875" ]]; then
+	/etc/init.d/simman disable
+	opkg remove simman --force-removal-of-dependent-packages && rm /tmp/luci-indexcache &
+	echo "Configuration without modem" > /dev/kmsg
+else
+	echo 105 > /sys/class/gpio/export
+	echo high > /sys/class/gpio/gpio105/direction
 
-echo 104 > /sys/class/gpio/export
-echo in > /sys/class/gpio/gpio104/direction
-echo 79 > /sys/class/gpio/export
-echo in > /sys/class/gpio/gpio79/direction
+	echo 83 > /sys/class/gpio/export
+	echo low > /sys/class/gpio/gpio83/direction
 
-echo 82 > /sys/class/gpio/export
-echo out > /sys/class/gpio/gpio82/direction
-echo 0 > /sys/class/gpio/gpio82/value
+	echo 104 > /sys/class/gpio/export
+	echo in > /sys/class/gpio/gpio104/direction
+	echo 79 > /sys/class/gpio/export
+	echo in > /sys/class/gpio/gpio79/direction
 
-echo 78 > /sys/class/gpio/export
-echo out > /sys/class/gpio/gpio78/direction
-echo 1 > /sys/class/gpio/gpio78/value
+	echo 82 > /sys/class/gpio/export
+	echo low > /sys/class/gpio/gpio82/direction
+
+	echo 78 > /sys/class/gpio/export
+	echo high > /sys/class/gpio/gpio78/direction
+fi
 
 # power up second modem
 echo 133 > /sys/class/gpio/export

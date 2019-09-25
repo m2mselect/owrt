@@ -29,7 +29,6 @@ COLLECTD_PLUGINS_DISABLED:= \
 	aquaero \
 	battery \
 	cgroups \
-	cpufreq \
 	curl_json \
 	curl_xml \
 	dbi \
@@ -87,6 +86,7 @@ COLLECTD_PLUGINS_SELECTED:= \
 	bind \
 	conntrack \
 	contextswitch \
+	cpufreq \
 	cpu \
 	csv \
 	curl \
@@ -280,6 +280,7 @@ $(eval $(call BuildPlugin,bind,BIND server/zone input,bind,+PACKAGE_collectd-mod
 $(eval $(call BuildPlugin,conntrack,connection tracking table size input,conntrack,))
 $(eval $(call BuildPlugin,contextswitch,context switch input,contextswitch,))
 $(eval $(call BuildPlugin,cpu,CPU input,cpu,))
+$(eval $(call BuildPlugin,cpufreq,CPU freq input,cpufreq,))
 $(eval $(call BuildPlugin,csv,CSV output,csv,))
 $(eval $(call BuildPlugin,curl,cURL input,curl,+PACKAGE_collectd-mod-curl:libcurl))
 #$(eval $(call BuildPlugin,dbi,relational database input,dbi,+PACKAGE_collectd-mod-dbi:libdbi))

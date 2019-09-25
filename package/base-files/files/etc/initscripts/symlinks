@@ -22,3 +22,4 @@
 	ln -s /sys/class/gpio/gpio65 /dev/pd3
 	ln -s /sys/bus/iio/devices/iio\:device0/in_voltage6_raw /dev/io3
 	
+	ln -s /sys/bus/iio/devices/iio\:device0/in_voltage3_raw /dev/board

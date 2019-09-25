@@ -195,7 +195,7 @@ body {
 }
 
 a {
-	color: #444444;
+	color: #600;
 	text-decoration: none;
 	line-height: inherit;
 	font-weight: inherit;
@@ -763,7 +763,7 @@ header {
 }
 
 header a {
-	color: #444444;
+	color: #600;
 	/*text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);*/
 }
 
@@ -783,7 +783,7 @@ header h3 a, header .brand {
 	display: block;
 	padding: 8px 20px 12px;
 	margin-left: -20px;
-	color: #444444;
+	color: #600;
 	font-size: 20px;
 	font-family: sans-serif;
 	font-weight: 200;
@@ -794,10 +794,10 @@ header h3 a, header .brand {
 .brand {
 	display: inline-block;
 	padding: 5px 0 5px 0!important;
-	width: 123px !important;
+	width: 135px !important;
 	height: 30px !important;
 	background-image: url('../resources/cbi/adt-logo-30.png');
-	background-size: 123px 30px;
+	background-size: 135px 30px;
 	background-position: center center;
 	background-repeat: no-repeat;
 	margin-right: 20px;
@@ -1359,12 +1359,12 @@ footer {
 .cbi-page-actions .cbi-button-apply,
 .cbi-page-actions .cbi-button-save,
 .cbi-page-actions .cbi-button-reset {
-	color: #444444;
+	color: #95110F;
 	padding: 5px 14px 6px;
 	background-color: #FFFFFF;
 	background-repeat: repeat-x;
 	background-image: none;
-	border-color: #444444;
+	border-color: #95110F;
 	text-shadow: none !important;
 	font-family: verdana;
 	/*background-image: -khtml-gradient(linear, left top, left bottom, from(#049cdb), to(#0064cd));

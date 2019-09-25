@@ -435,7 +435,7 @@ function diag_command(cmd, addr)
 end
 
 function diag_ping(addr)
-	diag_command("ping -c 5 -W 1 %q 2>&1", addr)
+	diag_command("ping -W3 -c5 -s8 %q 2>&1", addr)
 end
 
 function diag_traceroute(addr)

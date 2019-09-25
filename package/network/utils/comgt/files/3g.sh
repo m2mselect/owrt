@@ -61,11 +61,12 @@ proto_3g_setup() {
 
 			elif echo "$cardinfo" | grep -q Cinterion; then
 				case "$service" in
-					umts_only) CODE=2;;
-					gprs_only) CODE=0;;
-					*) CODE="1,2";;
+					umts_only) CODE="^SXRAT=2";;
+					gprs_only) CODE="^SXRAT=0";;
+					umts) CODE="^SXRAT=1,2";;
+					*) CODE="";;
 				esac
-				export MODE="AT^SXRAT=${CODE}"
+				export MODE="AT${CODE}"
 			
 			elif echo "$cardinfo" | grep -q Option; then
 				case "$service" in
