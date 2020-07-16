@@ -1,6 +1,39 @@
 #!/bin/ash
-mkdir /mnt/data
-mount -t ubifs ubi0_2 /mnt/data
+BBREC=$(uci get system.@system[0].bbrecovery)
+mkdir /mnt/data &>/dev/null
+mount -t ubifs ubi0_2 /mnt/data &>/dev/null
+if [ "$?" != "0" ] && [ "$BBREC" == "1" ]; then
+	echo "badblock searching"
+	BB=$(dmesg | grep -m1 "UBI error: ubi_io_read: error -74" | awk -F 'PEB ' '{print $2}' | awk -F ':' '{print $1}')
+	if [ -n "$BB" ]; then
+		FW_NAND_BOOT=$(fw_printenv nand_boot | grep "run extra_command" )
+		if [ -z "$FW_NAND_BOOT" ]; then
+			fw_setenv nand_boot "if itest \${update_flag} == 15963 ; then run autoupgrade;setenv update_flag 111;saveenv ; fi ; run extra_command; nand read 0x41000000 fdt \${filesize_fdt} ;nand read 0x42000000 kernel ${filesize_kernel} ; bootm 0x42000000 - 0x41000000"
+		fi
+		FW_EXTRA_COM=$(fw_printenv extra_command)
+		if [ "$FW_EXTRA_COM" != "extra_command=run checkbb" ]; then
+			fw_setenv extra_command "run checkbb"
+		fi
+		FW_CHECKBB=$(fw_printenv checkbb)
+		if [ -z "$FW_CHECKBB" ]; then
+			fw_setenv checkbb "if itest \${badblock} > 0; then nand markbad \${badblock}; setenv badblock -1; saveenv; ubi part root; ubi remove extra_ubi; ubi create extra_ubi; fi"
+		fi
+		BB=$((BB*131072+54788096))
+		BB=$(echo "obase=16; $BB" | bc)
+		fw_setenv badblock "0x$BB"
+		echo "badblock found: the system will reboot"
+		echo "badblock found: the system will reboot" > /dev/kmsg
+		reboot
+	fi
+	echo "badblock not found"
+fi
+
+BB=$(fw_printenv badblock)
+if [ "$BB" = "badblock=-1" ]; then
+	touch /mnt/data/recovered
+	date +"%F %T" >> /etc/bbevent
+	fw_setenv badblock "0"
+fi
 
 OVRL_BUG=$(dmesg | grep ramoverlay)
 	if [ ! -z "$OVRL_BUG" ]; then
@@ -14,4 +47,5 @@ if [ "$AFTER_UPD" -eq "111" ]; then
 	rm -r /mnt/data/upper/
 	fw_setenv update_flag 112
 	sync
+	reboot
 fi

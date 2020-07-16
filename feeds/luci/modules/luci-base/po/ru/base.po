@@ -4606,3 +4606,12 @@ msgstr "Возврат на данного участника осуществл
 
 msgid "Write system log to file"
 msgstr "Записывать системные события в файл"
+
+msgid "GPS Clock Synchronization"
+msgstr "Включить синхронизацию по GPS"
+
+msgid "Input Voltage"
+msgstr "Входное напряжение"
+
+msgid "CPU Temperature"
+msgstr "Температура CPU"

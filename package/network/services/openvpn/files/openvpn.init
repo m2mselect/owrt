@@ -153,9 +153,6 @@ start_service() {
 			openvpn_add_instance "$name" "${path%/*}" "$path"
 		fi
 	done
-	if [ ! -f "/etc/openvpn/auth" ]; then
-		touch /etc/openvpn/auth
-	fi
 }
 
 service_triggers() {

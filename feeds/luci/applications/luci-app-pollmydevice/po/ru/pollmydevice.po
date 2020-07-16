@@ -66,3 +66,15 @@ msgstr "Отключить логирование"
 
 msgid "New configuration (range [0-6]):"
 msgstr "Новая конфигурация (диапазон [0-6]): "
+
+msgid "Minimum data packet size to send. 0 - not used"
+msgstr "Минимальный размер пакета данных для отправки. 0 - не применяется"
+
+msgid "Time of data accumulation before sending. 0 - not used"
+msgstr "Время накопления данных для отправки. 0 - не применяется"
+
+msgid "Packet timeout [0-255] (x100ms)"
+msgstr "Таймаут пакета [0-255] (x100мс)"
+
+msgid "Minimum packet size [0-255] (byte)"
+msgstr "Минимальный размер пакета [0-255] (байт)"

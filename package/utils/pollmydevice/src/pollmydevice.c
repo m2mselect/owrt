@@ -436,7 +436,7 @@ void *ServerThreadFunc(void *args)
     //serialPortConfig.c_cc[VMIN]     = 0;                // blocking read until 1 character arrives (0 - no, 1 - yes)
     //serialPortConfig.c_cc[VTIME]    = 0;                // inter-character timer
 
-    unsigned char val = (uint8_t)((deviceConfig.timeout_pack/100)%256);
+    unsigned char val = (uint8_t)((deviceConfig.timeout_pack)%256);
     serialPortConfig.c_line &= ~ICANON;					//DISABLE CANONCIAL
     serialPortConfig.c_cc[VTIME]    = val;            	// inter-character timer
     LOG("Set VTIME=%d\n", val);
@@ -771,7 +771,7 @@ void *ClientThreadFunc(void *args)
 //    serialPortConfig.c_cc[VMIN]     = 0;                // blocking read until 1 character arrives (0 - no, 1 - yes)
 //    serialPortConfig.c_cc[VTIME]    = 0;                // inter-character timer
 
-    unsigned char val = (uint8_t)((deviceConfig.timeout_pack/100)%256);
+    unsigned char val = (uint8_t)((deviceConfig.timeout_pack)%256);
     serialPortConfig.c_line &= ~ICANON;					//DISABLE CANONCIAL
     serialPortConfig.c_cc[VTIME]    = val;            	// inter-character timer
     val = (uint8_t)(deviceConfig.size_pack%256);
@@ -1800,11 +1800,12 @@ device_config_t GetFullDeviceConfig(int deviceID)
     		(UCIptr.o==NULL || UCIptr.o->v.string==NULL))
     {
     	LOG("No UCI field %s \n", UCIpathPackTimeout);
+        deviceConfig.timeout_pack==0;
     }
     if(UCIptr.flags & UCI_LOOKUP_COMPLETE)
     	deviceConfig.timeout_pack = atoi(UCIptr.o->v.string);
-
-    // pack_timeout
+    
+    // pack_size
     memcpy(UCIpath , UCIpathBegin, MAX_CHARS_IN_UCIPATH);
     strncat(UCIpath, UCIpathNumber, MAX_DIGITS_IN_DEV_NUM-2);
     strncat(UCIpath, UCIpathPackSize, TMP_PATH_LENGTH);
@@ -1812,6 +1813,7 @@ device_config_t GetFullDeviceConfig(int deviceID)
     		(UCIptr.o==NULL || UCIptr.o->v.string==NULL))
     {
     	LOG("No UCI field %s \n", UCIpathPackSize);
+        deviceConfig.size_pack==0;
     }
     if(UCIptr.flags & UCI_LOOKUP_COMPLETE)
     	deviceConfig.size_pack = atoi(UCIptr.o->v.string);

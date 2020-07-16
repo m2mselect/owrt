@@ -30,6 +30,7 @@ enum {
 typedef struct testip{
 	uint8_t *ip;
 	uint16_t retry_check;
+	uint8_t sim_num; // 0 - sim0, 1 - sim1, 2 - both
 }testip_t;
 
 typedef struct sim_s
@@ -47,7 +48,7 @@ typedef struct settings_s{
 	uint8_t retry_num;
 	uint16_t check_period;
 	uint16_t delay;
-	testip_t serv[5];
+	testip_t serv[8];
 	sim_t sim[2];
 	uint8_t *atdevice;
 	uint8_t *iface;
@@ -110,7 +111,7 @@ int GetSimInfo(char *device)
 int ReadConfiguration(settings_t *set)
 {
 	char * p, path[128];
-	char i;
+	char i,j;
 
 	if ((p = GetUCIParam("simman.core.only_first_sim")) == NULL)
 	{
@@ -177,15 +178,17 @@ int ReadConfiguration(settings_t *set)
 	{
 		settings.serv[i].ip = NULL;
 		settings.serv[i].retry_check = 0;
+		settings.serv[i].sim_num = NULL;
 	}
 
 	i = 0;
 	while(tok && i < sizeof(settings.serv)/sizeof(settings.serv[0]))
 	{
+		settings.serv[i].sim_num = 2;
 		settings.serv[i++].ip = tok;
 		tok	= strtok(NULL," ");
 	}
-
+	j = i;
 	for (i = 0; i < sizeof(settings.sim)/sizeof(settings.sim[0]); i++)
 	{
 		settings.sim[i].init = 0;
@@ -197,6 +200,17 @@ int ReadConfiguration(settings_t *set)
 			continue;
 		}	
 		settings.sim[i].prio = atoi(p);
+		sprintf(path,"simman.@sim%d[0].testip",i);
+		if ((p = GetUCIParam(path)) != NULL)
+		{
+			char *tok = strtok(p," ");
+			while(tok && j < sizeof(settings.serv)/sizeof(settings.serv[0]))
+			{
+				settings.serv[j].sim_num = i;
+				settings.serv[j++].ip = tok;
+				tok	= strtok(NULL," ");
+			}
+		}
 		/*
 		   sprintf(path,"simman.@sim[%d].pin",i);
 		   if ((p = GetUCIParam(path)) == NULL)
@@ -324,6 +338,13 @@ int ModemStarted(char *atdevice)
 {
 	// 0 - OK, -1 - not found
 	return access(atdevice, F_OK);
+}
+
+int ModemReset()
+{
+	gpioSet(settings.gsmpow_pin,1);
+	sleep(5);
+	gpioSet(settings.gsmpow_pin,0);
 }
 
 int SetSim(uint8_t sim)
@@ -457,7 +478,10 @@ int main(int argc, char **argv)
 			{
 				if ((state < 0) || (state != INIT))
 				{
-					LOG("modem not found\n");
+					LOG("modem not found, try to turn on\n");
+					ModemReset();
+					sleep(60);
+					first_start = 1;
 					// changeCounter = settings.sw_before_modres;
 					// SetSim(active_sim);
 				}
@@ -670,31 +694,32 @@ int main(int argc, char **argv)
 							{
 								if (!settings.serv[i].ip)
 									break;
+								if (settings.serv[i].sim_num == 2 || settings.serv[i].sim_num == active_sim) {
+									int ack, cnt = 0;
+									do{
+										ack = ping((char*)settings.serv[i].ip, (char*)settings.iface);
+										//ack = ping((char*)settings.serv[i].ip);
+									}while(!ack && (++cnt < 3));
 
-								int ack, cnt = 0;
+									if (!ack) settings.serv[i].retry_check++;
+									else
+									{
+										settings.serv[i].retry_check = 0;
+										changeCounter = 0;		
+										changeCounterForReboot = 0;
+									}
 
-								do{
-									ack = ping((char*)settings.serv[i].ip, (char*)settings.iface);
-									//ack = ping((char*)settings.serv[i].ip);
-								}while(!ack && (++cnt < 3));
+									if (settings.serv[i].retry_check >= settings.retry_num)
+										need_change_sim++;
 
-								if (!ack) settings.serv[i].retry_check++;
-								else
-								{
-									settings.serv[i].retry_check = 0;
-									changeCounter = 0;		
-									changeCounterForReboot = 0;
+									if (!settings.serv[i].retry_check)
+										LOG("%s - LIVE\n", settings.serv[i].ip);
+									else
+										LOG("%s - DOWN (%d/%d)\n", settings.serv[i].ip,settings.serv[i].retry_check, settings.retry_num);
 								}
-
-								if (settings.serv[i].retry_check >= settings.retry_num)
-									need_change_sim++;
-
-								if (!settings.serv[i].retry_check)
-									LOG("%s - LIVE\n", settings.serv[i].ip);
 								else
-									LOG("%s - DOWN (%d/%d)\n", settings.serv[i].ip,settings.serv[i].retry_check, settings.retry_num);
+									need_change_sim++;
 							}
-
 							prev_time = now_time;
 							/*LOG("Reading SIM info...");
 							if(GetSimInfo(settings.atdevice))

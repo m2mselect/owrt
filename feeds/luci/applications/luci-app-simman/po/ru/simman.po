@@ -128,3 +128,15 @@ msgstr "Обновить информацию"
 
 msgid "Refresh"
 msgstr "Обновить"
+
+msgid "NB-IoT Modem Info"
+msgstr "Информация об NB-IoT модеме"
+
+msgid "if available"
+msgstr "если доступен"
+
+msgid "NB-IoT modem IMEI"
+msgstr "IMEI NB-IoT модема"
+
+msgid "Not available"
+msgstr "Не доступен"

@@ -1,8 +1,8 @@
 -- Copyright 2009-2015 Jo-Philipp Wich <jow@openwrt.org>
 -- Licensed to the public under the Apache License 2.0.
 
-local type, next, pairs, ipairs, loadfile, table
-	= type, next, pairs, ipairs, loadfile, table
+local type, next, pairs, ipairs, loadfile, table, select
+	= type, next, pairs, ipairs, loadfile, table, select
 
 local tonumber, tostring, math = tonumber, tostring, math
 
@@ -200,7 +200,7 @@ function _iface_ignore(x)
 			return true
 		end
 	end
-	return _iface_virtual(x)
+	return false
 end
 
 
@@ -221,13 +221,12 @@ function init(cursor)
 	local n, i
 	for n, i in ipairs(nxo.getifaddrs()) do
 		local name = i.name:match("[^:]+")
-		local prnt = name:match("^([^%.]+)%.")
 
 		if _iface_virtual(name) then
 			_tunnel[name] = true
 		end
 
-		if _tunnel[name] or not _iface_ignore(name) then
+		if _tunnel[name] or not (_iface_ignore(name) or _iface_virtual(name)) then
 			_interfaces[name] = _interfaces[name] or {
 				idx      = i.ifindex or n,
 				name     = name,
@@ -488,23 +487,20 @@ end
 function get_interfaces(self)
 	local iface
 	local ifaces = { }
-	local seen = { }
 	local nfs = { }
-	local baseof = { }
 
 	-- find normal interfaces
 	_uci_real:foreach("network", "interface",
 		function(s)
 			for iface in utl.imatch(s.ifname) do
-				if not _iface_ignore(iface) and not _wifi_iface(iface) then
-					seen[iface] = true
+				if not _iface_ignore(iface) and not _iface_virtual(iface) and not _wifi_iface(iface) then
 					nfs[iface] = interface(iface)
 				end
 			end
 		end)
 
 	for iface in utl.kspairs(_interfaces) do
-		if not (seen[iface] or _iface_ignore(iface) or _wifi_iface(iface)) then
+		if not (nfs[iface] or _iface_ignore(iface) or _iface_virtual(iface) or _wifi_iface(iface)) then
 			nfs[iface] = interface(iface)
 		end
 	end
@@ -662,8 +658,8 @@ function get_status_by_address(self, addr)
 end
 
 function get_wannet(self)
-	local net = self:get_status_by_route("0.0.0.0", 0)
-	return net and network(net)
+	local net, stat = self:get_status_by_route("0.0.0.0", 0)
+	return net and network(net, stat.proto)
 end
 
 function get_wandev(self)
@@ -672,8 +668,8 @@ function get_wandev(self)
 end
 
 function get_wan6net(self)
-	local net = self:get_status_by_route("::", 0)
-	return net and network(net)
+	local net, stat = self:get_status_by_route("::", 0)
+	return net and network(net, stat.proto)
 end
 
 function get_wan6dev(self)
@@ -779,11 +775,14 @@ function protocol.uptime(self)
 end
 
 function protocol.expires(self)
-	local a = tonumber(_uci_state:get("network", self.sid, "lease_acquired"))
-	local l = tonumber(_uci_state:get("network", self.sid, "lease_lifetime"))
-	if a and l then
-		l = l - (nxo.sysinfo().uptime - a)
-		return l > 0 and l or 0
+	local u = self:_ubus("uptime")
+	local d = self:_ubus("data")
+
+	if type(u) == "number" and type(d) == "table" and
+	   type(d.leasetime) == "number"
+	then
+		local r = (d.leasetime - (u % d.leasetime))
+		return r > 0 and r or 0
 	end
 	return -1
 end
@@ -795,6 +794,20 @@ end
 function protocol.ipaddr(self)
 	local addrs = self:_ubus("ipv4-address")
 	return addrs and #addrs > 0 and addrs[1].address
+end
+
+function protocol.ipaddrs(self)
+	local addrs = self:_ubus("ipv4-address")
+	local rv = { }
+
+	if type(addrs) == "table" then
+		local n, addr
+		for n, addr in ipairs(addrs) do
+			rv[#rv+1] = "%s/%d" %{ addr.address, addr.mask }
+		end
+	end
+
+	return rv
 end
 
 function protocol.netmask(self)
@@ -835,6 +848,28 @@ function protocol.ip6addr(self)
 	end
 end
 
+function protocol.ip6addrs(self)
+	local addrs = self:_ubus("ipv6-address")
+	local rv = { }
+	local n, addr
+
+	if type(addrs) == "table" then
+		for n, addr in ipairs(addrs) do
+			rv[#rv+1] = "%s/%d" %{ addr.address, addr.mask }
+		end
+	end
+
+	addrs = self:_ubus("ipv6-prefix-assignment")
+
+	if type(addrs) == "table" then
+		for n, addr in ipairs(addrs) do
+			rv[#rv+1] = "%s1/%d" %{ addr.address, addr.mask }
+		end
+	end
+
+	return rv
+end
+
 function protocol.gw6addr(self)
 	local _, route
 	for _, route in ipairs(self:_ubus("route") or { }) do
@@ -853,6 +888,13 @@ function protocol.dns6addrs(self)
 		end
 	end
 	return dns
+end
+
+function protocol.ip6prefix(self)
+	local prefix = self:_ubus("ipv6-prefix")
+	if prefix and #prefix > 0 then
+		return "%s/%d" %{ prefix[1].address, prefix[1].mask }
+	end
 end
 
 function protocol.is_bridge(self)
@@ -1066,7 +1108,8 @@ function interface.name(self)
 end
 
 function interface.mac(self)
-	return (self:_ubus("macaddr") or "00:00:00:00:00:00"):upper()
+	local mac = self:_ubus("macaddr")
+	return mac and mac:upper()
 end
 
 function interface.ipaddrs(self)

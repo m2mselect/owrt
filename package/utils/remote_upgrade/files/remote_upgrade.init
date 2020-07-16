@@ -1,0 +1,15 @@
+#!/bin/sh /etc/rc.common
+
+START=98
+
+remote() {	
+	config_get enabled "$1" "enabled" "0"
+	if [ "$enabled" -eq "1" ]; then
+		remote_upgrade load && remote_upgrade upgrade &
+	fi
+}
+
+boot() {
+	config_load remote_upgrade
+	config_foreach remote remote
+}

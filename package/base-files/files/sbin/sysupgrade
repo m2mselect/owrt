@@ -39,6 +39,7 @@ try_upgrade ()
 		if [ ! -f /tmp/sysupgrade_gtr.tar ]; 
 		then
 	    	echo "Sysupgrade file not found!"
+	    	exit 1
 		else
 
 			### if we have an upgrade archive
@@ -125,7 +126,7 @@ try_upgrade ()
                 rm /mnt/data/upper/etc/config/system
 			fi
 			fw_setenv update_flag 15963
-			reboot -f
+			reboot
 			##
 			###
 		fi
@@ -142,8 +143,24 @@ if_failed(){
 	exit 1
 }
 
+only_up(){
+	cd /tmp
+	VERSION=$(grep -r 'DISTRIB_DESCRIPTION' /etc/openwrt_release | awk -F "'" '{print $2}' | awk -F " " '{print $6}' | awk -F '.' '{print $1$2$3}')
+	VERSION=${VERSION:0:3}
+	if [ $(tar -tf sysupgrade_RTU*.tar openwrt_release) ]; then
+		NEW_VERSION=$(tar -xf sysupgrade_RTU*.tar openwrt_release -O | grep 'DISTRIB_DESCRIPTION' | awk -F "'" '{print $2}' | awk -F " " '{print $6}' | awk -F '.' '{print $1$2$3}')
+		NEW_VERSION=${NEW_VERSION:0:3}
+	else
+		if_failed
+	fi
+	# if NEW_VERSION <= VERSION
+	if [ "$NEW_VERSION" -le "$VERSION" ]; then
+		if_failed
+	fi
+}
+
 # check -key options
-while getopts "yt" opt; do
+while getopts "ytu" opt; do
 	case $opt in
 		y)
 			try_upgrade
@@ -151,6 +168,11 @@ while getopts "yt" opt; do
 			;;
 		t)
 			MODETEST=1
+			try_upgrade
+			exit 0
+			;;
+		u)
+			only_up
 			try_upgrade
 			exit 0
 			;;

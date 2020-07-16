@@ -3,7 +3,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=simman
 PKG_VERSION:=2
-PKG_RELEASE:=5
+PKG_RELEASE:=8
 PKG_BUILD_DIR:=$(BUILD_DIR)/simman
 #CMAKE_INSTALL:=1
 
@@ -40,6 +40,7 @@ define Package/simman/install
 	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_BIN) ./files/simman.init $(1)/etc/init.d/simman
 	$(INSTALL_DIR) $(1)/etc/simman
+	$(INSTALL_BIN) ./files/nbinfo.sh $(1)/etc/simman/nbinfo.sh
 	$(INSTALL_BIN) ./files/setsim.sh $(1)/etc/simman/setsim.sh
 	$(INSTALL_BIN) ./files/getccid.sh $(1)/etc/simman/getccid.sh
 	$(INSTALL_BIN) ./files/getimei.sh $(1)/etc/simman/getimei.sh

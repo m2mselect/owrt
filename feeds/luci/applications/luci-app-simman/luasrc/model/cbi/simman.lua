@@ -142,6 +142,10 @@ GPRS_pass = sim:option(Value, "GPRS_pass", translate("Password"))
   GPRS_pass.rmempty = true
   GPRS_pass.optional = false
 
+testip = sim:option(DynamicList, "testip",  translate("IP address of remote servers"))
+  testip.datatype = "ipaddr"
+  testip.cast = "string"
+
 --- SIM2 settings ---
 sim = m:section(TypedSection, "sim1", translate("SIM2 settings"))
   sim.addremove = false
@@ -173,6 +177,36 @@ GPRS_pass = sim:option(Value, "GPRS_pass", translate("Password"))
   GPRS_pass.default  = ""
   GPRS_pass.rmempty = true
   GPRS_pass.optional = false
+
+testip = sim:option(DynamicList, "testip",  translate("IP address of remote servers"))
+  testip.datatype = "ipaddr"
+  testip.cast = "string"
+
+nbiot = m:section(TypedSection, "nbiot", translate("NB-IoT Modem Info"), translate("if available"))
+  nbiot.addremove = false
+  nbiot.anonymous = true
+
+nb_imei = nbiot:option(DummyValue, "nb_imei",  translate("NB-IoT modem IMEI"))
+  nb_imei.default  = ""
+
+nb_ccid = nbiot:option(DummyValue, "nb_ccid",  translate("NB-IoT SIM CCID"))
+  nb_ccid.default  = ""
+
+btn = nbiot:option(Button, "_btn", translate("Refresh"))
+  btn.title      = translate("Refresh Info")
+  btn.inputtitle = translate("Refresh")
+  btn.inputstyle = "apply"
+  function btn.write(self, section)
+    local test = io.popen("/etc/simman/nbinfo.sh imei")
+    local result = test:read("*a")
+    test:close()
+    nb_imei.value = result
+
+    test = io.popen("/etc/simman/nbinfo.sh ccid")
+    local result = test:read("*a")
+    test:close()
+    nb_ccid.value = result
+  end
 
 function m.on_commit(self)
   -- Modified configurations got committed and the CBI is about to restart associated services

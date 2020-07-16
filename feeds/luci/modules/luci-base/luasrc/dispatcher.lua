@@ -357,6 +357,9 @@ function dispatch(request)
 					end
 
 					if sess and token then
+						io.stderr:write("luci: accepted login from %s\n" %{ 
+							http.getenv("REMOTE_ADDR") or "?" 
+						})
 						http.header("Set-Cookie", 'sysauth=%s; path=%s/' %{
 						   sess, build_url()
 						})

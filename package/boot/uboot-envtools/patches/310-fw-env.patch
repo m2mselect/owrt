@@ -1,0 +1,17 @@
+--- a/tools/env/fw_env.h	2020-02-19 13:26:12.194184254 +0300
++++ b/tools/env/fw_env.h	2020-02-19 13:26:29.354040330 +0300
+@@ -46,10 +46,10 @@
+ 
+ #ifndef CONFIG_BOOTCOMMAND
+ #define CONFIG_BOOTCOMMAND							\
+-	"bootp; "								\
+-	"setenv bootargs root=/dev/nfs nfsroot=${serverip}:${rootpath} "	\
+-	"ip=${ipaddr}:${serverip}:${gatewayip}:${netmask}:${hostname}::off; "	\
+-	"bootm"
++	"env default -a; "								\
++	"setenv filesize_rootfs 2000000; "								\
++	"saveenv;"	\
++	"reset "
+ #endif
+ 
+ extern int   fw_printenv(int argc, char *argv[]);

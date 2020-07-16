@@ -1,12 +1,19 @@
 #!/bin/sh
 
+rtc_device=$(fw_printenv rtc_device | awk -F '=' '{print $2}')
+
 i2cget -y 0 0x51 0x00 &>/dev/null
+
 if [[ "$?" == "0" ]]; then
 	echo pcf8563 0x51 > /sys/class/i2c-dev/i2c-0/device/new_device
-	fw_setenv rtc_device pcf8563
+	if [[ "$rtc_device" != "pcf8563" ]]; then
+		fw_setenv rtc_device pcf8563
+	fi
 else
 	echo ds3231 0x68 > /sys/class/i2c-dev/i2c-0/device/new_device
-	fw_setenv rtc_device ds3231
+	if [[ "$rtc_device" != "ds3231" ]]; then		
+		fw_setenv rtc_device ds3231
+	fi
 fi
 
 ln -s /dev/rtc1 /dev/rtc

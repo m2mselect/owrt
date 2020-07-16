@@ -1,0 +1,216 @@
+#!/bin/sh
+
+FW_DIR=$(uci get remote_upgrade.core.fw_dir)
+if [[ -z $FW_DIR ]]; then
+	logger -st remote_upgrade "fw_dir is not set"
+	exit 1
+fi
+if [[ ! -d $FW_DIR ]]; then
+	logger -st remote_upgrade "fw_dir is not exist"
+	exit 1
+fi
+
+FTPSERVER=$(uci get remote_upgrade.core.upgrade_server)
+if [[ -z $FTPSERVER ]]; then
+	logger -st remote_upgrade "upgrade_server is not set"
+	exit 1
+fi
+
+USER=$(uci get remote_upgrade.core.user)
+if [[ -z $USER ]]; then
+	logger -st remote_upgrade "user is not set"
+	exit 1
+fi
+
+PASS=$(uci get remote_upgrade.core.pass)
+if [[ -z $PASS ]]; then
+	logger -st remote_upgrade "pass is not set"
+	exit 1
+fi
+
+FW_NAME=$(uci get remote_upgrade.core.fw_name)
+if [[ -z $FW_NAME ]]; then
+	logger -st remote_upgrade "fw_name is not set"
+	exit 1
+fi
+#logger -st remote_upgrade ""
+load() {
+	ENABLED=$(uci get remote_upgrade.core.enabled)
+	if [ "$ENABLED" -eq "1" ]; then
+		logger -st remote_upgrade "Firmware download started"
+		cd $FW_DIR
+		rm .listing
+		wget --no-remove-listing --spider --timeout=5 --user=$USER --password=$PASS $FTPSERVER &>/dev/null
+		if ! grep -qr "$FW_NAME.tar" .listing ; then
+			logger -st remote_upgrade "Remote server is unavailable or does not contain the necessary files"
+			exit 1
+		fi
+		if ! grep -qr "$FW_NAME.tar.md5" .listing ; then
+			logger -st remote_upgrade "Remote server is unavailable or does not contain the necessary files"
+			exit 1
+		fi
+
+		if [[ -f $FW_NAME.tar && -f $FW_NAME.tar.md5 ]]; then
+			rm $FW_NAME.tar.md5
+			wget -c -nd -P $FW_DIR --timeout=5 --user=$USER --password=$PASS $FTPSERVER/$FW_NAME.tar &>/dev/null
+			while [[ "$?" != "0" ]]; do
+				wget -c -nd -P $FW_DIR --timeout=5 --user=$USER --password=$PASS $FTPSERVER/$FW_NAME.tar &>/dev/null
+			done
+			wget -c -nd -P $FW_DIR --timeout=5 --user=$USER --password=$PASS $FTPSERVER/$FW_NAME.tar.md5 &>/dev/null
+			while [ "$?" != "0" ]; do
+				wget -c -nd -P $FW_DIR --timeout=5 --user=$USER --password=$PASS $FTPSERVER/$FW_NAME.tar.md5 &>/dev/null
+			done
+			MD5_REAL=$(md5sum $FW_NAME.tar | awk -F ' ' '{print $1}')
+			MD5_EXPECTED=$(cat $FW_NAME.tar.md5 | awk -F ' ' '{print $1}')
+			if [ "$MD5_REAL" == "$MD5_EXPECTED" ]; then
+				logger -st remote_upgrade "Firmware is already loaded"
+				uci set remote_upgrade.core.enabled=0
+				uci commit
+				exit 0
+			fi
+		fi
+
+		rm $FW_NAME.*
+		wget -c -nd -P $FW_DIR --timeout=5 --user=$USER --password=$PASS $FTPSERVER/$FW_NAME.tar.md5 &>/dev/null
+		while [[ "$?" != "0" ]]; do
+			wget -c -nd -P $FW_DIR --timeout=5 --user=$USER --password=$PASS $FTPSERVER/$FW_NAME.tar.md5 &>/dev/null
+		done
+		wget -c -nd -P $FW_DIR --timeout=5 --user=$USER --password=$PASS $FTPSERVER/$FW_NAME.tar &>/dev/null
+		while [[ "$?" != "0" ]]; do
+			wget -c -nd -P $FW_DIR --timeout=5 --user=$USER --password=$PASS $FTPSERVER/$FW_NAME.tar &>/dev/null
+		done
+
+		MD5_REAL=$(md5sum $FW_NAME.tar | awk -F ' ' '{print $1}')
+		MD5_EXPECTED=$(cat $FW_NAME.tar.md5 | awk -F ' ' '{print $1}')
+		if [ "$MD5_REAL" != "$MD5_EXPECTED" ]; then
+			logger -st remote_upgrade "Upgrade archive is corrupted. Try again"
+			rm $FW_NAME.*
+			wget -c -nd -P $FW_DIR --timeout=5 --user=$USER --password=$PASS $FTPSERVER/$FW_NAME.tar.md5 &>/dev/null
+			while [[ "$?" != "0" ]]; do
+				wget -c -nd -P $FW_DIR --timeout=5 --user=$USER --password=$PASS $FTPSERVER/$FW_NAME.tar.md5 &>/dev/null
+			done
+			wget -c -nd -P $FW_DIR --timeout=5 --user=$USER --password=$PASS $FTPSERVER/$FW_NAME.tar &>/dev/null
+			while [[ "$?" != "0" ]]; do
+				wget -c -nd -P $FW_DIR --timeout=5 --user=$USER --password=$PASS $FTPSERVER/$FW_NAME.tar &>/dev/null
+			done
+
+			MD5_REAL=$(md5sum $FW_NAME.tar | awk -F ' ' '{print $1}')
+			MD5_EXPECTED=$(cat $FW_NAME.tar.md5 | awk -F ' ' '{print $1}')
+
+			if [ "$MD5_REAL" != "$MD5_EXPECTED" ]; then
+				logger -st remote_upgrade "Upgrade archive is corrupted. Abort"
+				exit 1
+			fi
+		fi
+		logger -st remote_upgrade "Firmware loaded successfully"		
+		uci set remote_upgrade.core.enabled=0
+		uci commit
+		exit 0
+	else
+		logger -st remote_upgrade "Upgrade disabled"	
+		exit 1
+	fi
+}
+
+load_force() {
+	logger -st remote_upgrade "Firmware download started"
+	cd $FW_DIR
+	rm .listing
+	wget --no-remove-listing --spider --timeout=5 --user=$USER --password=$PASS $FTPSERVER &>/dev/null
+	if ! grep -qr "$FW_NAME.tar" .listing ; then
+		logger -st remote_upgrade "Remote server is unavailable or does not contain the necessary files"
+		exit 1
+	fi
+	if ! grep -qr "$FW_NAME.tar.md5" .listing ; then
+		logger -st remote_upgrade "Remote server is unavailable or does not contain the necessary files"
+		exit 1
+	fi
+
+	if [[ -f $FW_NAME.tar && -f $FW_NAME.tar.md5 ]]; then
+		rm $FW_NAME.tar.md5
+		wget -c -nd -P $FW_DIR --timeout=5 --user=$USER --password=$PASS $FTPSERVER/$FW_NAME.tar &>/dev/null
+		while [[ "$?" != "0" ]]; do
+			wget -c -nd -P $FW_DIR --timeout=5 --user=$USER --password=$PASS $FTPSERVER/$FW_NAME.tar &>/dev/null
+		done
+		wget -c -nd -P $FW_DIR --timeout=5 --user=$USER --password=$PASS $FTPSERVER/$FW_NAME.tar.md5 &>/dev/null
+		while [ "$?" != "0" ]; do
+			wget -c -nd -P $FW_DIR --timeout=5 --user=$USER --password=$PASS $FTPSERVER/$FW_NAME.tar.md5 &>/dev/null
+		done
+		MD5_REAL=$(md5sum $FW_NAME.tar | awk -F ' ' '{print $1}')
+		MD5_EXPECTED=$(cat $FW_NAME.tar.md5 | awk -F ' ' '{print $1}')
+		if [ "$MD5_REAL" == "$MD5_EXPECTED" ]; then
+			logger -st remote_upgrade "Firmware is already loaded"
+			exit 0
+		fi
+	fi
+
+	rm $FW_NAME.*
+	wget -c -nd -P $FW_DIR --timeout=5 --user=$USER --password=$PASS $FTPSERVER/$FW_NAME.tar.md5 &>/dev/null
+	while [[ "$?" != "0" ]]; do
+		wget -c -nd -P $FW_DIR --timeout=5 --user=$USER --password=$PASS $FTPSERVER/$FW_NAME.tar.md5 &>/dev/null
+	done
+	wget -c -nd -P $FW_DIR --timeout=5 --user=$USER --password=$PASS $FTPSERVER/$FW_NAME.tar &>/dev/null
+	while [[ "$?" != "0" ]]; do
+		wget -c -nd -P $FW_DIR --timeout=5 --user=$USER --password=$PASS $FTPSERVER/$FW_NAME.tar &>/dev/null
+	done
+
+	MD5_REAL=$(md5sum $FW_NAME.tar | awk -F ' ' '{print $1}')
+	MD5_EXPECTED=$(cat $FW_NAME.tar.md5 | awk -F ' ' '{print $1}')
+	if [ "$MD5_REAL" != "$MD5_EXPECTED" ]; then
+		logger -st remote_upgrade "Upgrade archive is corrupted. Try again"
+		rm $FW_NAME.*
+		wget -c -nd -P $FW_DIR --timeout=5 --user=$USER --password=$PASS $FTPSERVER/$FW_NAME.tar.md5 &>/dev/null
+		while [[ "$?" != "0" ]]; do
+			wget -c -nd -P $FW_DIR --timeout=5 --user=$USER --password=$PASS $FTPSERVER/$FW_NAME.tar.md5 &>/dev/null
+		done
+		wget -c -nd -P $FW_DIR --timeout=5 --user=$USER --password=$PASS $FTPSERVER/$FW_NAME.tar &>/dev/null
+		while [[ "$?" != "0" ]]; do
+			wget -c -nd -P $FW_DIR --timeout=5 --user=$USER --password=$PASS $FTPSERVER/$FW_NAME.tar &>/dev/null
+		done
+
+		MD5_REAL=$(md5sum $FW_NAME.tar | awk -F ' ' '{print $1}')
+		MD5_EXPECTED=$(cat $FW_NAME.tar.md5 | awk -F ' ' '{print $1}')
+
+		if [ "$MD5_REAL" != "$MD5_EXPECTED" ]; then
+			logger -st remote_upgrade "Upgrade archive is corrupted. Abort"
+			exit 1
+		fi
+	fi
+	logger -st remote_upgrade "Firmware loaded successfully"
+	exit 0
+}
+
+upgrade() {
+	cd $FW_DIR
+	cp $FW_NAME.tar /tmp/sysupgrade_RTU968.tar
+	logger -st remote_upgrade "Sysupgrade process started"
+	fw_setenv update_flag 113
+	sysupgrade -t && sysupgrade -u
+}
+
+upgrade_force() {
+	cd $FW_DIR
+	cp $FW_NAME.tar /tmp/sysupgrade_RTU968.tar
+	logger -st remote_upgrade "Sysupgrade process (force) started"
+	fw_setenv update_flag 113
+	sysupgrade -t && sysupgrade -y
+}
+
+case "$1" in
+	load)
+		eval load
+	;;
+	load_force)
+		eval load_force
+	;;
+	upgrade)
+		eval upgrade
+	;;
+	upgrade_force)
+		eval upgrade_force
+	;;
+	*)
+		logger -st remote_upgrade "Command is not supported. Use the following commands: load load_force upgrade upgrade_force"
+	;;
+esac
+

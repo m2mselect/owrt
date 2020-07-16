@@ -267,17 +267,6 @@ function device( val, seen )
 	return false
 end
 
-function lengthvalidation(val, min, max, regex)
-	if #val >= min and #val <= max then
-		if regex then
-			return (val:match(regex) ~= nil)
-		else
-			return true
-		end
-	end
-	return false
-end
-
 function uciname(val)
 	return (val:match("^[a-zA-Z0-9_]+$") ~= nil)
 end

@@ -2,7 +2,7 @@
 
 case "$1" in
 	list)
-		echo '{ "info": { } }'
+		echo '{ "info": { }, "adc": { } }'
 	;;
 	call)
 		case "$2" in
@@ -13,6 +13,18 @@ case "$1" in
 				echo '{'
 				echo "\"voltage\": \"$volt\" ,"
 				echo "\"temperature\": \"$temp\""
+				echo '}'
+			;;
+			adc)
+				adc0=$((($(cat /dev/io0)+$(cat /dev/io0)+$(cat /dev/io0))/3))
+				adc1=$((($(cat /dev/io1)+$(cat /dev/io1)+$(cat /dev/io1))/3))
+				adc2=$((($(cat /dev/io2)+$(cat /dev/io2)+$(cat /dev/io2))/3))
+				adc3=$((($(cat /dev/io3)+$(cat /dev/io3)+$(cat /dev/io3))/3))
+				echo '{'
+				echo "\"adc0\": \"$adc0\" ,"
+				echo "\"adc1\": \"$adc1\" ,"
+				echo "\"adc2\": \"$adc2\" ,"
+				echo "\"adc3\": \"$adc3\""
 				echo '}'
 			;;
 		esac

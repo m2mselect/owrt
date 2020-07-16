@@ -3,6 +3,7 @@ config system
 	option hostname 'GTRx0'
 	option timezone 'GMT0'
 	option zonename 'UTC'
+	option bbrecovery '0'
 
 config timeserver 'ntp'
 	option enable '1'

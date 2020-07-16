@@ -107,25 +107,16 @@ holdconntime = s:option(Value, "holdconntime",  translate("Connection Hold Time 
   --holdconntime.rmempty = false
   holdconntime:depends("mode","server")
 
-pack_timeout = s:option(Value, "pack_timeout",  translate("Packet timeout (msec)"))
-  pack_timeout.default = 0
-  pack_timeout.datatype = "and(uinteger, min(0), max(25500))"
-  pack_timeout:depends("mode","server")
-  pack_timeout:depends("mode","client")
-
-pack_size = s:option(Value, "pack_size",  translate("Packet size (byte)"))
-  pack_size.default = 255
-  pack_size.datatype = "and(uinteger, min(1), max(255))"
+pack_size = s:option(Value, "pack_size",  translate("Minimum packet size [0-255] (byte)"), translate("Minimum data packet size to send. 0 - not used"))
+  pack_size.default = 0
+  pack_size.datatype = "and(uinteger, min(0), max(255))"
   pack_size:depends("mode","server")
   pack_size:depends("mode","client")
 
-modbus_gateway = s:option(ListValue, "modbus_gateway", translate("Modbus TCP/IP"))  -- create checkbox
-  modbus_gateway.default = 0
-  modbus_gateway:value(0,"Disabled")
-  modbus_gateway:value(1,"RTU")
-  modbus_gateway:value(2,"ASCII")
-  modbus_gateway:depends("mode","server")
-  modbus_gateway:depends("client_auth",0)
+pack_timeout = s:option(Value, "pack_timeout",  translate("Packet timeout [0-255] (x100ms)"), translate("Time of data accumulation before sending. 0 - not used"))
+  pack_timeout.default = 0
+  pack_timeout.datatype = "and(uinteger, min(0), max(255))"
+  for i=1,255 do pack_timeout:depends("pack_size",i) end
 
 client_host = s:option(Value, "client_host",  translate("Server Host or IP Address"))
   client_host.default = ""
@@ -155,6 +146,14 @@ client_auth = s:option(ListValue, "client_auth", translate("Client Authentificat
 adtid = s:option(DummyValue, "adtid",  translate("Device ID"))
   --client_auth.rmempty = false
   adtid:depends("mode","client")
+
+modbus_gateway = s:option(ListValue, "modbus_gateway", translate("Modbus TCP/IP"))  -- create checkbox
+  modbus_gateway.default = 0
+  modbus_gateway:value(0,"Disabled")
+  modbus_gateway:value(1,"RTU")
+  modbus_gateway:value(2,"ASCII")
+  modbus_gateway:depends("mode","server")
+  modbus_gateway:depends("client_auth",0)
 
 coff = s:option(Button, "coff", translate("Disable console port"), translate("Save the changes. The router will reboot"))  
   coff.title      = translate("Disable console port")
