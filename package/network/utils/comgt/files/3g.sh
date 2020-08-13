@@ -43,6 +43,16 @@ proto_3g_setup() {
 		*)
 			chat="/etc/chatscripts/3g.chat"
 			cardinfo=$(gcom -d "$device" -s /etc/gcom/getcardinfo.gcom)
+			counter=0
+			while [[ -z "$cardinfo" ]];
+			do
+				sleep 1
+				cardinfo=$(gcom -d "$device" -s /etc/gcom/getcardinfo.gcom)
+				counter=$((counter+1))
+				if [[ "$counter" -ge "10" ]]; then
+					break
+				fi
+			done
 			if echo "$cardinfo" | grep -q Novatel; then
 				case "$service" in
 					umts_only) CODE=2;;

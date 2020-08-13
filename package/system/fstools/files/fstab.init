@@ -6,6 +6,10 @@ START=40
 start() {                            
 	echo "this file has been obseleted. please call \"/sbin/block mount\" directly"
 	/sbin/block mount
+	if [[ -z "$(uci get fstab.@ov_ro[0])" ]]; then
+		uci add fstab ov_ro
+		uci commit fstab
+	fi
 }
 
 stop() {                            

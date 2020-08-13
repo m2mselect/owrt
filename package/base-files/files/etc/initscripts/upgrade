@@ -42,10 +42,16 @@ OVRL_BUG=$(dmesg | grep ramoverlay)
 	fi
 
 AFTER_UPD=$(fw_printenv update_flag | sed -e s/update_flag=//)
-if [ "$AFTER_UPD" -eq "111" ]; then
+if [ "$AFTER_UPD" -eq "111" ] && [ -e "/mnt/data/upper/" ]; then
 	cp -ap /mnt/data/upper/* /
 	rm -r /mnt/data/upper/
 	fw_setenv update_flag 112
 	sync
+	sleep 45
 	reboot
+fi
+
+OVRL_RO=$(fw_printenv ro_overlay | sed -e s/ro_overlay=//)
+if [ "$OVRL_RO" -eq "1" ]; then
+	mount -o ro,remount /overlay
 fi

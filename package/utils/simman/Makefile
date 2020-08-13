@@ -3,7 +3,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=simman
 PKG_VERSION:=2
-PKG_RELEASE:=8
+PKG_RELEASE:=9
 PKG_BUILD_DIR:=$(BUILD_DIR)/simman
 #CMAKE_INSTALL:=1
 

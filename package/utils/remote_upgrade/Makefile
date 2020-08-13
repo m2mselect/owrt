@@ -27,8 +27,6 @@ define Package/remote_upgrade/install
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/files/remote_upgrade $(1)/sbin/
 	$(INSTALL_DIR) $(1)/etc/config
 	$(CP) 		   $(PKG_BUILD_DIR)/files/remote_upgrade.config $(1)/etc/config/remote_upgrade
-	$(INSTALL_DIR) $(1)/etc/init.d
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/files/remote_upgrade.init $(1)/etc/init.d/remote_upgrade
 endef
 
 $(eval $(call BuildPackage,remote_upgrade))

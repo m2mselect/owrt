@@ -198,4 +198,38 @@ dev.cfgvalue = function(self, section)
 	end
 end
 
+ov_ro = m:section(TypedSection, "ov_ro", translate("Overlay Partition Write Protection"), translate("Switches the partition to Read-Only mode"))
+  ov_ro.optional = false
+  ov_ro.anonymous = true
+
+ro_en = ov_ro:option(DummyValue, "ro_en",  translate("Read-Only mode"))
+  function ro_en.cfgvalue(self, section)
+    local test = io.popen("fw_printenv ro_overlay | sed -e s/ro_overlay=//")
+    local result = test:read("*a")
+    test:close()
+    if tonumber(result) == 1 then
+       return "enabled"
+    else
+       return "disabled"
+    end
+  end  
+
+btn = ov_ro:option(Button, "_btn", translate("Switch mode (Read-Only/Read-Write)"))
+  btn.title      = translate("Switch mode (Read-Only/Read-Write)")
+  btn.inputtitle = translate("Apply")
+  btn.inputstyle = "apply"
+  function btn.write(self, section)
+  	local test = io.popen("fw_printenv ro_overlay | sed -e s/ro_overlay=//")
+    local result = test:read("*a")
+    test:close()
+    if tonumber(result)==1 then
+      luci.sys.call("fw_setenv ro_overlay 0")
+      luci.sys.call("mount -o rw,remount /overlay")
+    else
+      luci.sys.call("fw_setenv ro_overlay 1")
+      luci.sys.call("mount -o ro,remount /overlay")
+    end
+  end
+
+
 return m

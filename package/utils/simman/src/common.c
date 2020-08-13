@@ -184,7 +184,7 @@ char *GetIMEI()
 	// script not found
 		return NULL;
 	
-	fp = popen("uci -q get simman.core.imei","r");
+	fp = popen("cat /tmp/simman/imei","r");
 
 	if (fp == NULL)
 	{
@@ -225,7 +225,7 @@ char *GetIMEI()
 	{
 	 // update uci configuration
 	 char cmd[128];
-	 sprintf(cmd,"uci set simman.core.imei=%s && uci commit simman",b);
+	 sprintf(cmd,"echo %s > /tmp/simman/imei",b);
 	 //fprintf(stderr,"diag: %s\n", cmd);
 
 	 fp = popen(cmd,"r");
@@ -280,7 +280,7 @@ char *GetCCID()
 	{
 	 // update uci configuration
 	  char cmd[128];
-	  sprintf(cmd,"uci set simman.core.ccid=%s && uci commit simman",b);
+	  sprintf(cmd,"echo %s > /tmp/simman/ccid",b);
 	  //fprintf(stderr,"diag: %s\n", cmd);
 
 	  fp = popen(cmd,"r");
