@@ -8,7 +8,7 @@ PKG_NAME:=luci-app-iolines
 LUCI_DEPENDS:=
 
 # Version: <major>.<minor>.<patch>
-PKG_VERSION:=0.2.0
+PKG_VERSION:=0.2.2
 
 PKG_RELEASE:=2
 

@@ -9,9 +9,7 @@ case "$ACTION" in
                 ln -s $DEVICE_NAME /dev/gps0
                 uci set simman.core.gpsdevice=$DEVICE_NAME
                 ATPORT=$(uci get simman.info.atdevice)
-                gcom -d $ATPORT -s /etc/simman/gpson.gcom
-                /etc/init.d/gpsd restart
-                /etc/init.d/ntpd restart
+                sleep 20 && gcom -d $ATPORT -s /etc/simman/gpson.gcom && /etc/init.d/gpsd restart && /etc/init.d/ntpd restart &
             fi
         fi
         ;;

@@ -1,0 +1,11 @@
+if [ "$PRODUCT" == "10c4/ea70/100" -a "$DEVPATH" == /devices/soc0/80080000.ahb/80090000.usb/ci_hdrc.1/usb1/1-1/1-1.3/1-1.3:1.0 ]; then
+	case "$ACTION" in
+    	add)
+    		DEVICE_NAME=$(ls /sys/$DEVPATH | grep tty)
+            ln -s /dev/$DEVICE_NAME /dev/com2
+    	;;
+    	remove)
+    		rm /dev/com2
+    	;;
+    esac
+fi

@@ -31,4 +31,6 @@ fi
 
 # power up second modem
 echo 133 > /sys/class/gpio/export
+echo low > /sys/class/gpio/gpio133/direction
+sleep 10
 echo high > /sys/class/gpio/gpio133/direction

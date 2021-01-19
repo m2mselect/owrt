@@ -47,7 +47,7 @@ if [ "$AFTER_UPD" -eq "111" ] && [ -e "/mnt/data/upper/" ]; then
 	rm -r /mnt/data/upper/
 	fw_setenv update_flag 112
 	sync
-	sleep 45
+	sleep 10
 	reboot
 fi
 

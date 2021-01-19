@@ -5,10 +5,11 @@ STOP=84
 
 start()
 {
+	/sbin/eth_wdt &
 	/etc/initscripts/symlinks &
 	/etc/initscripts/modeminit &
 	/etc/initscripts/usbhost &
 	/etc/initscripts/gpsinit &
-	/etc/initscripts/upgrade &	
+	#/etc/initscripts/upgrade &	
 	/etc/initscripts/rtcinit
 }

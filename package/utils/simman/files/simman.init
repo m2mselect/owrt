@@ -27,7 +27,7 @@ start_service_daemon(){
 
 	section_enabled "$s" || return 1
 	if [[ -e "/tmp/simman" ]]; then
-		rm /tmp/simman/*
+		rm /tmp/simman/* &>/dev/null
 	else
 		mkdir /tmp/simman
 		echo "0" > /tmp/simman/sim

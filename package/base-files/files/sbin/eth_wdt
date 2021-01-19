@@ -1,0 +1,23 @@
+#!/bin/sh
+
+LAST_EVENT=0
+cat /dev/kmsg | \
+while read line; do
+	KEV=$(echo $line | grep "MDIO read timeout")
+	if [[ -n "$KEV"  ]];then
+		CUR_EVENT=$(echo $line | awk -F ',' '{print $3}')
+		DIFF=$((CUR_EVENT-LAST_EVENT))
+		if [[ "$DIFF" -gt "5000000" ]]; then
+			IF=$(uci show network | grep 'eth0' | awk -F '.' '{print $2}')
+			ubus call network.interface.$IF down && sleep 1 && ubus call network.interface.$IF up
+			LAST_EVENT=$(echo $CUR_EVENT)
+		fi
+	fi
+	KEV=$(echo $line | grep "HC died")
+	if [[ -n "$KEV"  ]];then
+		echo ci_hdrc.1 > /sys/bus/platform/drivers/ci_hdrc/unbind
+		sleep 1
+		echo ci_hdrc.1 > /sys/bus/platform/drivers/ci_hdrc/bind
+		echo "ci_hdrc ci_hdrc.1: HC restored" > /dev/kmsg
+	fi
+done

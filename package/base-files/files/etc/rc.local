@@ -5,4 +5,6 @@ ln -s /dev/ttyAPP2 /dev/com1
 
 /etc/initscripts/beeper &
 
+/etc/initscripts/upgrade
+
 exit 0

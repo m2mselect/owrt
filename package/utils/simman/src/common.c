@@ -296,7 +296,7 @@ int GetSIG()
 {
 	FILE *fp;
     char b[32];
-	char path[] = "/etc/simman/getsig.sh";
+	char path[] = "/etc/simman/getcsq.sh";
 
 	if ( access(path, F_OK) == -1 )
 		return 0;
@@ -305,11 +305,13 @@ int GetSIG()
 
 	if (fp == NULL)
 	{
+		pclose(fp);
 		return 0;
 	}
 
 	if ( fgets(b,sizeof(b)-1, fp) == NULL )
 	{
+		pclose(fp);
 		return 0;
 	}
 	pclose(fp);

@@ -48,6 +48,7 @@ typedef struct settings_s{
 	uint8_t retry_num;
 	uint16_t check_period;
 	uint16_t delay;
+	uint16_t csq_level;
 	testip_t serv[8];
 	sim_t sim[2];
 	uint8_t *atdevice;
@@ -140,6 +141,12 @@ int ReadConfiguration(settings_t *set)
 		return -1;
 	}	
 	settings.delay = atoi(p);
+
+	if ((p = GetUCIParam("simman.core.csq_level")) == NULL)
+	{
+		settings.csq_level = 0;
+	}	
+	settings.csq_level = atoi(p);
 
 	if ((p = GetUCIParam("simman.core.sw_before_modres")) == NULL)
 	{
@@ -438,6 +445,7 @@ int main(int argc, char **argv)
 		tmp, 
 		ch_sim,
 		num_sim,
+		sig_level,
 		hot_change;
 
 	time_t now_time, prev_time, prev_delay_time;
@@ -686,6 +694,17 @@ int main(int argc, char **argv)
 							if (diff < settings.check_period)
 								break;
 
+							if (settings.csq_level != 0){
+								sig_level = GetSIG();
+								if (sig_level == 99) {
+									sleep(1);
+									sig_level = GetSIG();
+								}
+								LOG("Current ASU: %d\n", sig_level);
+								if (sig_level < settings.csq_level || sig_level == 99)
+									LOG("ASU not detectable or below specified: %d ASU (min: %d ASU)\n", sig_level, settings.csq_level);
+							}
+
 							LOG("check servers\n");
 
 							uint8_t need_change_sim = 0;
@@ -701,7 +720,10 @@ int main(int argc, char **argv)
 										//ack = ping((char*)settings.serv[i].ip);
 									}while(!ack && (++cnt < 3));
 
-									if (!ack) settings.serv[i].retry_check++;
+									if (!ack) 
+										settings.serv[i].retry_check++;
+									else if (settings.csq_level != 0 && (sig_level < settings.csq_level || sig_level == 99))
+										settings.serv[i].retry_check++;
 									else
 									{
 										settings.serv[i].retry_check = 0;
@@ -712,14 +734,20 @@ int main(int argc, char **argv)
 									if (settings.serv[i].retry_check >= settings.retry_num)
 										need_change_sim++;
 
-									if (!settings.serv[i].retry_check)
-										LOG("%s - LIVE\n", settings.serv[i].ip);
+									if (ack)
+									{										
+										if (settings.csq_level != 0 && (sig_level < settings.csq_level || sig_level == 99))
+											LOG("%s - LIVE; ASU LOW (%d/%d)\n", settings.serv[i].ip,settings.serv[i].retry_check, settings.retry_num);
+										else
+											LOG("%s - LIVE\n", settings.serv[i].ip);
+									}
 									else
 										LOG("%s - DOWN (%d/%d)\n", settings.serv[i].ip,settings.serv[i].retry_check, settings.retry_num);
 								}
 								else
 									need_change_sim++;
 							}
+
 							prev_time = now_time;
 							/*LOG("Reading SIM info...");
 							if(GetSimInfo(settings.atdevice))

@@ -8,8 +8,8 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=xl2tpd
-PKG_VERSION:=devel-20150930
-PKG_RELEASE:=1
+PKG_VERSION:=1.3.15
+PKG_RELEASE:=2
 PKG_MAINTAINER:=Yousong Zhou <yszhou4tech@gmail.com>
 PKG_LICENSE:=GPL-2.0
 PKG_LICENSE_FILES:=LICENSE
@@ -17,8 +17,9 @@ PKG_LICENSE_FILES:=LICENSE
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_URL:=https://github.com/xelerance/xl2tpd.git
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
-PKG_SOURCE_VERSION:=5faece38704ae32063abe1d25e199c03e6f44669
+PKG_SOURCE_VERSION:=v$(PKG_VERSION)
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
+PKG_MIRROR_HASH:=e12232fef216a1cb5b74f990616aff1dd851c62812ef54658a330629823c0996
 
 PKG_INSTALL:=1
 
@@ -38,9 +39,6 @@ l2tpd is the open source implementation of the L2TP tunneling protocol (RFC2661)
 It does implement both LAC and LNS role in a L2TP networking architecture. The
 main goal of this protocol is to tunnel PPP frame trough an IP network.
 endef
-
-# Use optimization options from OpenWrt build system
-MAKE_FLAGS += OFLAGS=""
 
 ifneq (0,0)
   # debugging options from Makefile of xl2tpd package

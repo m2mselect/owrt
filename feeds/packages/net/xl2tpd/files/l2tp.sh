@@ -20,19 +20,20 @@ proto_l2tp_init_config() {
 	available=1
 	no_device=1
 	no_proto_task=1
+	teardown_on_l3_link_down=1
 }
 
 proto_l2tp_setup() {
 	local interface="$1"
 	local optfile="/tmp/l2tp/options.${interface}"
+	local ip serv_addr server host
 
-	local ip serv_addr server
-	json_get_var server server && {
-		for ip in $(resolveip -t 5 "$server"); do
-			( proto_add_host_dependency "$interface" "$ip" )
-			serv_addr=1
-		done
-	}
+	json_get_var server server
+	host="${server%:*}"
+	for ip in $(resolveip -t 5 "$host"); do
+		( proto_add_host_dependency "$interface" "$ip" )
+		serv_addr=1
+	done
 	[ -n "$serv_addr" ] || {
 		echo "Could not resolve server address" >&2
 		sleep 5
@@ -56,14 +57,9 @@ proto_l2tp_setup() {
 		done
 	fi
 
-	local ipv6 demand keepalive username password pppd_options mtu
-	json_get_vars ipv6 demand keepalive username password pppd_options mtu
+	local ipv6 keepalive username password pppd_options mtu
+	json_get_vars ipv6 keepalive username password pppd_options mtu
 	[ "$ipv6" = 1 ] || ipv6=""
-	if [ "${demand:-0}" -gt 0 ]; then
-		demand="precompiled-active-filter /etc/ppp/filter demand idle $demand"
-	else
-		demand="persist"
-	fi
 
 	local interval="${keepalive##*[, ]}"
 	[ "$interval" != "$keepalive" ] || interval=5
