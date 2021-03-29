@@ -30,7 +30,7 @@ voltage = s:option(DummyValue, "voltage", translate("Measured voltage on ADC, mV
         local devver = test:read("*a")
         test:close()
         if tonumber(string.format("%d", devver))>750 and tonumber(string.format("%d", devver))<850 then
-          result = result * 13.164
+          result = result * 8.219
         else
           result = result * 4.365
         end
@@ -47,7 +47,7 @@ resist = s:option(DummyValue, "resist", translate("Measured resistance by ADC, O
         local devver = test:read("*a")
         test:close()
         if tonumber(string.format("%d", devver))>750 and tonumber(string.format("%d", devver))<850 then
-          result = result * 0.845
+          result = result * 1.022
         else
           result = result * 0.543
         end        

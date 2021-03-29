@@ -1,0 +1,21 @@
+index e32f08a..6be10e2 100644 (file)
+--- a/interface.c
++++ b/interface.c
+@@ -673,7 +673,7 @@
+ 		interface_do_free(iface);
+ 		return;
+ 	}
+-	if (iface->autostart && iface->available)
++	if (iface->autostart)
+ 		interface_set_up(iface);
+ 	else if (iface->dynamic)
+ 		set_config_state(iface, IFC_REMOVE);
+@@ -1066,7 +1066,7 @@
+ 	struct interface *iface;
+ 
+ 	vlist_for_each_element(&interfaces, iface, node) {
+-		if (iface->available && iface->autostart)
++		if (iface->autostart)
+ 			interface_set_up(iface);
+ 	}
+ }

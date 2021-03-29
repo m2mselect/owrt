@@ -1,0 +1,10 @@
+#!/bin/ash
+AFTER_UPD=$(fw_printenv update_flag | sed -e s/update_flag=//)
+if [ "$AFTER_UPD" -eq "111" ] && [ -e "/mnt/data/upper/" ]; then
+	cp -ap /mnt/data/upper/* /
+	rm -r /mnt/data/upper/
+	fw_setenv update_flag 112
+	sync
+	sleep 10
+	reboot
+fi

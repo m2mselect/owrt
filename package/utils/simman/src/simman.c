@@ -691,7 +691,7 @@ int main(int argc, char **argv)
 								break;
 							}
 
-							if (diff < settings.check_period)
+							if (diff < settings.check_period && diff >= 0)
 								break;
 
 							if (settings.csq_level != 0){

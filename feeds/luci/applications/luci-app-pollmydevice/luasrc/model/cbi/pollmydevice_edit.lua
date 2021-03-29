@@ -101,11 +101,17 @@ server_port = s:option(Value, "server_port",  translate("Server Port"))
   --server_port.rmempty = false
   server_port:depends("mode","server")
 
+connection_mode = s:option(ListValue, "connection_mode", translate("Connection Mode"))
+  connection_mode.default = 0
+  connection_mode:value(0,translate("Alternating"))
+  connection_mode:value(1,translate("Simultaneous"))
+  connection_mode:depends("mode","server")
+
 holdconntime = s:option(Value, "holdconntime",  translate("Connection Hold Time (sec)"))
   holdconntime.default = 60
   holdconntime.datatype = "and(uinteger, min(0), max(100000))"
   --holdconntime.rmempty = false
-  holdconntime:depends("mode","server")
+  holdconntime:depends("connection_mode",0)
 
 pack_size = s:option(Value, "pack_size",  translate("Minimum packet size [0-255] (byte)"), translate("Minimum data packet size to send. 0 - not used"))
   pack_size.default = 0

@@ -113,6 +113,30 @@ function ip4addr(val)
 	return false
 end
 
+function ip4addrport(val, bracket)
+	local h, p = val:match("^([^:]+):([^:]+)$")
+	return (h and p and ip4addr(h) and port(p))
+end
+
+function ip4addrport(val)
+	local h, p = val:match("^([^:]+):([^:]+)$")
+	return (h and p and ip4addr(h) and port(p))
+end
+
+function ipaddrport(val, bracket)
+	local h, p = val:match("^([^%[%]:]+):([^:]+)$")
+	if (h and p and ip4addr(h) and port(p)) then
+		return true
+	elseif (bracket == 1) then
+		h, p = val:match("^%[(.+)%]:([^:]+)$")
+		if  (h and p and ip6addr(h) and port(p)) then
+			return true
+		end
+	end
+	h, p = val:match("^([^%[%]]+):([^:]+)$")
+	return (h and p and ip6addr(h) and port(p))
+end
+
 function ip4prefix(val)
 	val = tonumber(val)
 	return ( val and val >= 0 and val <= 32 )

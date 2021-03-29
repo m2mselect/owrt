@@ -127,7 +127,11 @@ proto_qmi_setup() {
 		sleep 5;
 	done
 
-	[ -n "$modes" ] && uqmi -s -d "$device" --set-network-modes "$modes"
+	if [ -n "$modes" ]; then
+		uqmi -s -d "$device" --set-network-modes "$modes"
+	else
+		uqmi -s -d "$device" --set-network-modes "all"
+	fi
 
 	echo "Starting network $interface"
 

@@ -1,0 +1,11 @@
+#!/bin/sh
+
+uci -q batch <<-EOF >/dev/null
+	delete ucitrack.@pingcontrol[-1]
+	add ucitrack pingcontrol
+	set ucitrack.@pingcontrol[-1].init=pingcontrol
+	commit ucitrack
+EOF
+
+rm -f /tmp/luci-indexcache
+exit 0

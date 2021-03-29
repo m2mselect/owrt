@@ -7,7 +7,7 @@ case "$ACTION" in
             if [ "$GPSPORT" != "/dev/ttyAPP1" ]; then
                 rm /dev/gps0
                 ln -s $DEVICE_NAME /dev/gps0
-                uci set simman.core.gpsdevice=$DEVICE_NAME
+                uci set simman.core.gpsdevice=$DEVICE_NAME && uci commit simman
                 ATPORT=$(uci get simman.info.atdevice)
                 sleep 20 && gcom -d $ATPORT -s /etc/simman/gpson.gcom && /etc/init.d/gpsd restart && /etc/init.d/ntpd restart &
             fi

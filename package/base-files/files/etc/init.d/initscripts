@@ -10,6 +10,6 @@ start()
 	/etc/initscripts/modeminit &
 	/etc/initscripts/usbhost &
 	/etc/initscripts/gpsinit &
-	#/etc/initscripts/upgrade &	
+	/etc/initscripts/upgrade &	
 	/etc/initscripts/rtcinit
 }

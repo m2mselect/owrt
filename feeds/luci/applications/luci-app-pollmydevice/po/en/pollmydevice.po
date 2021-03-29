@@ -63,3 +63,12 @@ msgstr "Enable"
 
 msgid "New configuration (range [0-6]):"
 msgstr "New configuration (range [0-6]):"
+
+msgid "Connection Mode"
+msgstr "Connection Mode"
+
+msgid "Alternating"
+msgstr "Alternating"
+
+msgid "Simultaneous"
+msgstr "Simultaneous"
