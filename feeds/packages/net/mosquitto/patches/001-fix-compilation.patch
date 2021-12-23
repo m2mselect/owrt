@@ -1,0 +1,11 @@
+--- a/src/websockets.c
++++ b/src/websockets.c
+@@ -29,6 +29,8 @@
+ 
+ #ifdef WITH_WEBSOCKETS
+ 
++#define _GNU_SOURCE
++
+ #include "config.h"
+ 
+ #include <libwebsockets.h>

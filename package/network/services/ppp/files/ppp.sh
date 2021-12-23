@@ -120,25 +120,42 @@ ppp_generic_setup() {
 	[ -n "$connect" ] || json_get_var connect connect
 	[ -n "$disconnect" ] || json_get_var disconnect disconnect
 
-	proto_run_command "$config" /usr/sbin/pppd \
-		nodetach ipparam "$config" \
-		ifname "$pppname" \
-		${localip:+$localip:} \
-		${lcp_failure:+lcp-echo-interval $lcp_interval lcp-echo-failure $lcp_failure $lcp_adaptive} \
-		${ipv6:++ipv6} \
-		${autoipv6:+set AUTOIPV6=1} \
-		nodefaultroute \
-		usepeerdns \
-		$demand maxfail 1 \
-		${username:+user "$username" password "$password"} \
-		${connect:+connect "$connect"} \
-		${disconnect:+disconnect "$disconnect"} \
-		ip-up-script /lib/netifd/ppp-up \
-		ipv6-up-script /lib/netifd/ppp-up \
-		ip-down-script /lib/netifd/ppp-down \
-		ipv6-down-script /lib/netifd/ppp-down \
-		${mtu:+mtu $mtu mru $mtu} \
-		"$@" $pppd_options
+	if [ "$proto" == "nbiot" ]; then
+		proto_run_command "$config" /usr/sbin/pppd \
+			nodetach ipparam "$config" \
+			ifname "$pppname" \
+			${localip:+$localip:} \
+			nodefaultroute \
+			usepeerdns \
+			$demand maxfail 1 \
+			${username:+user "$username" password "$password"} \
+			${connect:+connect "$connect"} \
+			${disconnect:+disconnect "$disconnect"} \
+			ip-up-script /lib/netifd/ppp-up \
+			ip-down-script /lib/netifd/ppp-down \
+			${mtu:+mtu $mtu mru $mtu} \
+			"$@" $pppd_options
+	else
+		proto_run_command "$config" /usr/sbin/pppd \
+			nodetach ipparam "$config" \
+			ifname "$pppname" \
+			${localip:+$localip:} \
+			${lcp_failure:+lcp-echo-interval $lcp_interval lcp-echo-failure $lcp_failure $lcp_adaptive} \
+			${ipv6:++ipv6} \
+			${autoipv6:+set AUTOIPV6=1} \
+			nodefaultroute \
+			usepeerdns \
+			$demand maxfail 1 \
+			${username:+user "$username" password "$password"} \
+			${connect:+connect "$connect"} \
+			${disconnect:+disconnect "$disconnect"} \
+			ip-up-script /lib/netifd/ppp-up \
+			ipv6-up-script /lib/netifd/ppp-up \
+			ip-down-script /lib/netifd/ppp-down \
+			ipv6-down-script /lib/netifd/ppp-down \
+			${mtu:+mtu $mtu mru $mtu} \
+			"$@" $pppd_options
+	fi
 }
 
 ppp_generic_teardown() {

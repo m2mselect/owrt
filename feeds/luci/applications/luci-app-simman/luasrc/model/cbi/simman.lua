@@ -51,6 +51,12 @@ delay = section_gen:option(Value, "delay",  translate("Return to priority SIM, s
   delay.rmempty = false
   delay.optional = false
 
+csq_level = section_gen:option(Value, "csq_level",  translate("Minimum acceptable signal level, ASU (min: 1, max: 31)"),  translate("0 - not used"))
+  csq_level.default = 0
+  csq_level.datatype = "and(uinteger, min(0), max(31))"
+  csq_level.rmempty = false
+  csq_level.optional = false
+
 atdevice = section_gen:option(Value, "atdevice",  translate("AT modem device name"))
   atdevice.default = "/dev/ttyACM3"
   atdevice.datatype = "device"
@@ -181,32 +187,6 @@ GPRS_pass = sim:option(Value, "GPRS_pass", translate("Password"))
 testip = sim:option(DynamicList, "testip",  translate("IP address of remote servers"))
   testip.datatype = "ipaddr"
   testip.cast = "string"
-
-nbiot = m:section(TypedSection, "nbiot", translate("NB-IoT Modem Info"), translate("if available"))
-  nbiot.addremove = false
-  nbiot.anonymous = true
-
-nb_imei = nbiot:option(DummyValue, "nb_imei",  translate("NB-IoT modem IMEI"))
-  nb_imei.default  = ""
-
-nb_ccid = nbiot:option(DummyValue, "nb_ccid",  translate("NB-IoT SIM CCID"))
-  nb_ccid.default  = ""
-
-btn = nbiot:option(Button, "_btn", translate("Refresh"))
-  btn.title      = translate("Refresh Info")
-  btn.inputtitle = translate("Refresh")
-  btn.inputstyle = "apply"
-  function btn.write(self, section)
-    local test = io.popen("/etc/simman/nbinfo.sh imei")
-    local result = test:read("*a")
-    test:close()
-    nb_imei.value = result
-
-    test = io.popen("/etc/simman/nbinfo.sh ccid")
-    local result = test:read("*a")
-    test:close()
-    nb_ccid.value = result
-  end
 
 function m.on_commit(self)
   -- Modified configurations got committed and the CBI is about to restart associated services

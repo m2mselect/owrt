@@ -24,8 +24,14 @@ section_enabled(){
 
 start_service_daemon(){
 	local s="$1"
+	config_get FIRSTSTART "$s" firststart
 
 	section_enabled "$s" || return 1
+	if [[ "$FIRSTSTART" -eq "1" ]]; then
+		/etc/simman/modeminit &
+		uci set simman.$s.firststart="0"
+		uci commit simman
+	fi
 	if [[ -e "/tmp/simman" ]]; then
 		rm /tmp/simman/* &>/dev/null
 	else

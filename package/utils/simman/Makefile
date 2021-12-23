@@ -56,6 +56,7 @@ define Package/simman/install
 	$(INSTALL_BIN) ./files/getpackinfo.sh $(1)/etc/simman/getpackinfo.sh
 	$(INSTALL_BIN) ./files/getcsq.sh $(1)/etc/simman/getcsq.sh
 	$(INSTALL_BIN) ./files/check_prio.sh $(1)/etc/simman/check_prio.sh
+	$(INSTALL_BIN) ./files/modeminit $(1)/etc/simman/modeminit
 	$(CP) ./files/*.gcom $(1)/etc/simman
 	$(INSTALL_DIR) $(1)/etc/hotplug.d/usb
 	$(INSTALL_DATA) ./files/simman.hotplug $(1)/etc/hotplug.d/usb/12-modem

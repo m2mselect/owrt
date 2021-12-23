@@ -2016,3 +2016,8 @@ td.cbi-value-field var {
 #cbi-simman-info > .cbi-value .cbi-value-field {
 	line-height:normal;
 }
+
+#cbi-network-nbiot-imei > .cbi-value-field,
+#cbi-network-nbiot-ccid > .cbi-value-field {
+	padding-top: 4px;
+}
