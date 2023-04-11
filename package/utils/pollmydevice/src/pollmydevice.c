@@ -1902,8 +1902,9 @@ device_config_t GetFullDeviceConfig(int deviceID)
     sprintf(cmd,"uci set pollmydevice.%d.adtid=%lld && uci commit pollmydevice",deviceID, deviceConfig.adtID);
     FILE *fp;
     fp = popen(cmd,"r");
-    if (popen(cmd,"r") != NULL) 
+    if (fp != NULL) {
         pclose(fp);
+    }
 
 
     uci_free_context(UCIcontext);

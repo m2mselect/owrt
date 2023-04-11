@@ -1,5 +1,6 @@
 #!/bin/sh
 
+. /usr/share/libubox/jshn.sh
 OPTIND=1
 
 GPIO_PATH=/sys/class/gpio
@@ -122,6 +123,11 @@ proto=$(uci -q get simman.core.proto)
 # find 3g interface
 iface=$(uci show network | awk "/proto='3g'|proto='qmi'/" | awk -F'.' '{print $2}')
 
+if [ -z "$iface" ]; then
+	IFACE=$(uci -q get simman.core.iface)
+	json_load "$(ubus call network.interface.$IFACE status)"
+	json_get_var iface l3_device
+fi
 [ -z "$iface" ] && logger -t $tag "Not found 3g/4g interface" && exit 0 
 
 # Check if SIM card placed in holder
@@ -261,7 +267,7 @@ if [ "$mode" == "0" ]; then
 
      reg=$($CONFIG_DIR/getreg.sh)
 
-     [ "$reg" == "'UNKNOWN'" ] || [ "$reg" == "'NOT REGISTERED'" ] || [ "$reg" == "NONE" ] && break
+     [ "$reg" == "'UNKNOWN'" ] || [ "$reg" == "'NOT REGISTERED'" ] || [ "$reg" == "NONE" ] || break
 
 	 logger -t $tag "retry #$retry reading CREG, now registration status $reg"
 
@@ -276,6 +282,11 @@ if [ "$sim" == "1" ]; then
 else
  echo "0" > $GPIO_PATH/gpio$SIMADDR_PIN/value
  echo "1" > /tmp/simman/sim
+fi
+
+if [ "$proto" == "4" ]; then	
+	COMMAND="AT+CGDCONT=1,\"IP\",\"$apn\"" gcom -d "$ATDEVICE" -s /etc/gcom/runcommand.gcom &>/dev/null
+	COMMAND="AT+CNMP=2" gcom -d "$ATDEVICE" -s /etc/gcom/runcommand.gcom &>/dev/null
 fi
 
 sleep 1
