@@ -128,6 +128,7 @@ if [ -z "$iface" ]; then
 	json_load "$(ubus call network.interface.$IFACE status)"
 	json_get_var iface l3_device
 fi
+[ -z "$iface" ] && iface=$(uci -q get simman.core.iface)
 [ -z "$iface" ] && logger -t $tag "Not found 3g/4g interface" && exit 0 
 
 # Check if SIM card placed in holder
